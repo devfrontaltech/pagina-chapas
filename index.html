@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PawTag – La chapa que habla por tu perro</title>
+  <meta name="description" content="Chapas para perros con QR inteligente. Escanea y accede a toda la información de tu mascota al instante." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --green:   #2D6A4F;
+      --green-l: #40916C;
+      --amber:   #F4A261;
+      --amber-d: #E07B39;
+      --bg:      #FAFAF8;
+      --card:    #FFFFFF;
+      --text:    #1A1A2E;
+      --muted:   #5E6074;
+      --border:  #E2E2DC;
+      --radius:  14px;
+      --shadow:  0 4px 24px rgba(0,0,0,.08);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 68px;
+      background: rgba(250,250,248,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo svg { width: 36px; height: 36px; }
+    .nav-logo span {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--green);
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none; font-size: .9rem; font-weight: 500;
+      color: var(--muted); transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--green); }
+
+    .nav-cta {
+      background: var(--green); color: #fff !important;
+      padding: .5rem 1.2rem; border-radius: 50px;
+      font-weight: 600 !important; font-size: .88rem !important;
+      transition: background .2s !important;
+    }
+    .nav-cta:hover { background: var(--green-l) !important; }
+
+    .hamburger {
+      display: none; background: none; border: none; cursor: pointer;
+      flex-direction: column; gap: 5px; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 24px; height: 2px;
+      background: var(--text); border-radius: 2px; transition: .3s;
+    }
+
+    .mobile-menu {
+      display: none; position: fixed; top: 68px; left: 0; right: 0;
+      background: var(--card); border-bottom: 1px solid var(--border);
+      padding: 1.5rem 5%; flex-direction: column; gap: 1.2rem; z-index: 99;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      text-decoration: none; font-size: 1rem; font-weight: 500; color: var(--text);
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 100px 5% 60px;
+      position: relative; overflow: hidden;
+    }
+
+    .hero-paw {
+      position: absolute; right: -60px; top: 50%;
+      transform: translateY(-50%);
+      width: min(620px, 80vw); opacity: .055;
+      pointer-events: none; user-select: none;
+    }
+
+    .hero-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+      max-width: 1100px; margin: 0 auto; width: 100%;
+      position: relative; z-index: 1;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #EBF4EF; color: var(--green);
+      font-size: .8rem; font-weight: 600; letter-spacing: .06em;
+      padding: .35rem .9rem; border-radius: 50px; margin-bottom: 1.2rem;
+      text-transform: uppercase;
+    }
+    .hero-eyebrow svg { width: 14px; height: 14px; }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+      font-weight: 900; line-height: 1.1;
+      color: var(--text); margin-bottom: 1.2rem;
+    }
+    .hero-title em {
+      font-style: normal; color: var(--green);
+    }
+
+    .hero-sub {
+      font-size: 1.05rem; color: var(--muted);
+      max-width: 440px; margin-bottom: 2rem; line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green); color: #fff;
+      padding: .85rem 1.8rem; border-radius: 50px;
+      font-weight: 600; font-size: .95rem; text-decoration: none;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 16px rgba(45,106,79,.3);
+    }
+    .btn-primary:hover {
+      background: var(--green-l); transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(45,106,79,.38);
+    }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--text);
+      padding: .85rem 1.8rem; border-radius: 50px;
+      font-weight: 600; font-size: .95rem; text-decoration: none;
+      border: 2px solid var(--border); transition: border-color .2s, transform .15s;
+    }
+    .btn-secondary:hover { border-color: var(--green); transform: translateY(-2px); }
+
+    .hero-visual {
+      display: flex; justify-content: center; align-items: center;
+    }
+    .hero-card-wrap {
+      position: relative;
+    }
+    .hero-img-placeholder {
+      width: 340px; height: 340px;
+      background: linear-gradient(135deg, #EBF4EF 0%, #D7EDDF 100%);
+      border-radius: 28px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; box-shadow: var(--shadow);
+      border: 2px dashed rgba(45,106,79,.25);
+      position: relative;
+    }
+    .hero-img-placeholder svg { width: 72px; height: 72px; opacity: .4; }
+    .hero-img-placeholder p {
+      color: var(--muted); font-size: .85rem; text-align: center; max-width: 200px;
+    }
+    .hero-badge {
+      position: absolute; bottom: -16px; right: -16px;
+      background: var(--amber); color: #fff;
+      border-radius: 50%; width: 72px; height: 72px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: .62rem; font-weight: 700; text-align: center; line-height: 1.2;
+      box-shadow: 0 4px 14px rgba(244,162,97,.4);
+    }
+
+    /* ── SECTION BASE ── */
+    section { padding: 90px 5%; }
+    .section-eyebrow {
+      display: block; font-size: .78rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--green); margin-bottom: .6rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 900; line-height: 1.15;
+      margin-bottom: 1rem; color: var(--text);
+    }
+    .section-sub {
+      font-size: 1rem; color: var(--muted); max-width: 560px; line-height: 1.7;
+    }
+    .centered { text-align: center; }
+    .centered .section-sub { margin: 0 auto; }
+
+    /* ── HOW IT WORKS ── */
+    #como-funciona { background: #fff; }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem; margin-top: 3.5rem;
+    }
+    .step-card {
+      background: var(--bg); border-radius: var(--radius);
+      padding: 2rem; position: relative; overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+    .step-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem; font-weight: 900;
+      color: var(--green); opacity: .12;
+      position: absolute; top: 12px; right: 18px; line-height: 1;
+    }
+    .step-icon {
+      width: 48px; height: 48px;
+      background: #EBF4EF; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .step-icon svg { width: 24px; height: 24px; color: var(--green); }
+    .step-card h3 {
+      font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem;
+    }
+    .step-card p { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── PRODUCT / QR DEMO ── */
+    #producto { background: var(--bg); }
+    .product-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: center;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .product-img-wrap {
+      position: relative; display: flex; justify-content: center;
+    }
+    .product-img-frame {
+      width: 100%; max-width: 420px;
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #EBF4EF, #D0EAD8);
+      border-radius: 24px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem; box-shadow: var(--shadow);
+      padding: 2rem; text-align: center;
+      border: 2px dashed rgba(45,106,79,.3);
+    }
+    .product-img-frame img {
+      width: 100%; height: 100%;
+      object-fit: contain; border-radius: 16px;
+      display: none; /* se muestra con JS si src existe */
+    }
+    .product-img-placeholder-txt {
+      color: var(--muted); font-size: .82rem;
+    }
+    /* cuando hay imagen real */
+    .product-img-frame.has-img img { display: block; }
+    .product-img-frame.has-img .product-img-placeholder-txt { display: none; }
+    .product-img-frame.has-img svg.placeholder-svg { display: none; }
+
+    .scan-pulse {
+      position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+      background: var(--green); color: #fff;
+      border-radius: 50px; padding: .55rem 1.3rem;
+      font-size: .82rem; font-weight: 600;
+      display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 4px 16px rgba(45,106,79,.3);
+      white-space: nowrap;
+    }
+    .scan-pulse::before {
+      content: ''; display: block; width: 8px; height: 8px;
+      background: var(--amber); border-radius: 50%;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .5; transform: scale(1.4); }
+    }
+
+    .product-text { padding-left: 1rem; }
+    .product-text .section-title { margin-bottom: 1.2rem; }
+    .product-features { list-style: none; display: flex; flex-direction: column; gap: .9rem; margin: 1.8rem 0; }
+    .product-features li {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: .95rem; color: var(--muted);
+    }
+    .feat-dot {
+      flex-shrink: 0; width: 22px; height: 22px;
+      background: #EBF4EF; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 2px;
+    }
+    .feat-dot svg { width: 12px; height: 12px; color: var(--green); }
+
+    /* ── BENEFITS ── */
+    #ventajas { background: var(--green); color: #fff; }
+    #ventajas .section-eyebrow { color: var(--amber); }
+    #ventajas .section-title { color: #fff; }
+    #ventajas .section-sub { color: rgba(255,255,255,.75); }
+    .benefits-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .benefit-card {
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--radius); padding: 1.8rem;
+      transition: background .2s, transform .2s;
+    }
+    .benefit-card:hover { background: rgba(255,255,255,.14); transform: translateY(-3px); }
+    .benefit-icon { font-size: 2rem; margin-bottom: .8rem; }
+    .benefit-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; color: #fff; }
+    .benefit-card p { font-size: .88rem; color: rgba(255,255,255,.7); line-height: 1.6; }
+
+    /* ── FAQ ── */
+    #faq { background: #fff; }
+    .faq-list {
+      max-width: 700px; margin: 3rem auto 0;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .faq-item {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .faq-question {
+      width: 100%; background: none; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 1.5rem;
+      font-family: 'Inter', sans-serif; font-size: .97rem; font-weight: 600;
+      color: var(--text); text-align: left;
+      transition: background .15s;
+    }
+    .faq-question:hover { background: var(--bg); }
+    .faq-chevron { transition: transform .3s; flex-shrink: 0; }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-answer {
+      max-height: 0; overflow: hidden; transition: max-height .35s ease;
+    }
+    .faq-item.open .faq-answer { max-height: 300px; }
+    .faq-answer p {
+      padding: 0 1.5rem 1.3rem; font-size: .92rem;
+      color: var(--muted); line-height: 1.7;
+    }
+
+    /* ── CONTACT ── */
+    #contacto { background: var(--bg); }
+    .contact-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+    }
+    .contact-text .section-title { margin-bottom: 1rem; }
+    .contact-text p { color: var(--muted); font-size: .97rem; line-height: 1.7; margin-bottom: 2rem; }
+    .contact-options {
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .contact-btn {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--card); border: 2px solid var(--border);
+      border-radius: var(--radius); padding: 1.1rem 1.4rem;
+      text-decoration: none; color: var(--text);
+      font-weight: 600; font-size: .95rem;
+      transition: border-color .2s, transform .15s, box-shadow .2s;
+    }
+    .contact-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    .contact-btn.whatsapp:hover { border-color: #25D366; }
+    .contact-btn.phone:hover { border-color: var(--green); }
+    .contact-btn-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .contact-btn.whatsapp .contact-btn-icon { background: #E8FAF0; }
+    .contact-btn.phone .contact-btn-icon { background: #EBF4EF; }
+    .contact-btn-text span:first-child { display: block; font-size: .75rem; color: var(--muted); font-weight: 500; }
+
+    .contact-visual {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 1.5rem; text-align: center;
+    }
+    .paw-circle {
+      width: 180px; height: 180px; border-radius: 50%;
+      background: linear-gradient(135deg, #EBF4EF, #D0EAD8);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .paw-circle svg { width: 90px; height: 90px; }
+    .contact-visual p { color: var(--muted); font-size: .88rem; line-height: 1.6; max-width: 240px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--text); color: rgba(255,255,255,.6);
+      padding: 3rem 5%;
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 1.5rem; text-align: center;
+    }
+    .footer-logo {
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .footer-logo span {
+      font-family: 'Playfair Display', serif; font-size: 1.4rem;
+      font-weight: 900; color: #fff;
+    }
+    .footer-tagline { font-size: .88rem; }
+    .footer-links {
+      display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; justify-content: center;
+    }
+    .footer-links a {
+      text-decoration: none; color: rgba(255,255,255,.5);
+      font-size: .85rem; transition: color .2s;
+    }
+    .footer-links a:hover { color: #fff; }
+    .footer-copy { font-size: .8rem; }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 2.5rem; }
+      .hero-sub { margin: 0 auto 2rem; }
+      .hero-actions { justify-content: center; }
+      .hero-visual { order: -1; }
+      .hero-img-placeholder { width: 280px; height: 280px; }
+      .product-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .product-text { padding-left: 0; }
+      .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .contact-visual { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      section { padding: 70px 6%; }
+      .hero-title { font-size: 2.1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <!-- Paw icon -->
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="24" cy="29" rx="10" ry="9" fill="#2D6A4F"/>
+        <ellipse cx="12" cy="22" rx="4.5" ry="5.5" fill="#2D6A4F"/>
+        <ellipse cx="36" cy="22" rx="4.5" ry="5.5" fill="#2D6A4F"/>
+        <ellipse cx="17" cy="16" rx="3.5" ry="4.5" fill="#2D6A4F"/>
+        <ellipse cx="31" cy="16" rx="3.5" ry="4.5" fill="#2D6A4F"/>
+      </svg>
+      <span>PawTag</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#como-funciona">Cómo funciona</a></li>
+      <li><a href="#producto">El producto</a></li>
+      <li><a href="#ventajas">Ventajas</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contacto" class="nav-cta">Pedir ahora</a></li>
+    </ul>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── MOBILE MENU ── -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#como-funciona" onclick="closeMobileMenu()">Cómo funciona</a>
+    <a href="#producto" onclick="closeMobileMenu()">El producto</a>
+    <a href="#ventajas" onclick="closeMobileMenu()">Ventajas</a>
+    <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
+    <a href="#contacto" onclick="closeMobileMenu()">Pedir ahora</a>
+  </div>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <!-- Huge paw watermark -->
+    <svg class="hero-paw" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <ellipse cx="100" cy="125" rx="45" ry="40" fill="#2D6A4F"/>
+      <ellipse cx="47" cy="88" rx="20" ry="24" fill="#2D6A4F"/>
+      <ellipse cx="153" cy="88" rx="20" ry="24" fill="#2D6A4F"/>
+      <ellipse cx="68" cy="60" rx="16" ry="20" fill="#2D6A4F"/>
+      <ellipse cx="132" cy="60" rx="16" ry="20" fill="#2D6A4F"/>
+    </svg>
+
+    <div class="hero-inner">
+      <div class="hero-content">
+        <span class="hero-eyebrow">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 8a5 5 0 0110 0v1H3V8z"/></svg>
+          Seguridad para tu mascota
+        </span>
+        <h1 class="hero-title">
+          La chapa que<br/>
+          <em>habla por</em><br/>
+          tu perro
+        </h1>
+        <p class="hero-sub">
+          Un QR inteligente en su collar. Cualquiera que lo encuentre puede ver sus datos de contacto al instante — sin apps, sin complicaciones.
+        </p>
+        <div class="hero-actions">
+          <a href="#contacto" class="btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.5 2C6.262 2 2 6.262 2 11.5c0 1.819.497 3.522 1.353 4.994L2 22l5.614-1.338A9.469 9.469 0 0011.5 21C16.738 21 21 16.738 21 11.5S16.738 2 11.5 2z"/></svg>
+            Pedir por WhatsApp
+          </a>
+          <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-card-wrap">
+          <div class="hero-img-placeholder">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="8" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
+              <rect x="36" y="8" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
+              <rect x="8" y="36" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
+              <rect x="12" y="12" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
+              <rect x="40" y="12" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
+              <rect x="12" y="40" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
+              <rect x="36" y="36" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
+              <rect x="44" y="36" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
+              <rect x="36" y="44" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
+              <rect x="44" y="44" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
+              <rect x="55" y="44" width="5" height="5" fill="#2D6A4F" opacity=".3"/>
+            </svg>
+            <p>Tu imagen de chapa aparecerá aquí</p>
+          </div>
+          <div class="hero-badge">QR<br/>VIVO</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section id="como-funciona">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="centered reveal">
+        <span class="section-eyebrow">El proceso</span>
+        <h2 class="section-title">Tan fácil como 1, 2, 3</h2>
+        <p class="section-sub">En pocos pasos tu perro lleva su ficha completa colgando del collar</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card reveal">
+          <span class="step-number">1</span>
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h3>Eliges el diseño</h3>
+          <p>Escoge entre nuestras plantillas o dinos cómo quieres tu chapa. La personalizamos a tu gusto.</p>
+        </div>
+        <div class="step-card reveal">
+          <span class="step-number">2</span>
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+            </svg>
+          </div>
+          <h3>Rellenamos la ficha</h3>
+          <p>Nombre del perro, tu número de teléfono, información médica… lo que tú decidas mostrar.</p>
+        </div>
+        <div class="step-card reveal">
+          <span class="step-number">3</span>
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+            </svg>
+          </div>
+          <h3>La recibes en casa</h3>
+          <p>Te enviamos la chapa lista. Pónsela al collar y el QR ya está activo para quien la escanee.</p>
+        </div>
+        <div class="step-card reveal">
+          <span class="step-number">4</span>
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <h3>¡Tu perro está seguro!</h3>
+          <p>Si alguna vez se pierde, cualquiera puede escanear el QR y localizarte en segundos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PRODUCT + QR DEMO ── -->
+  <section id="producto">
+    <div class="product-inner">
+      <div class="product-img-wrap reveal">
+        <!--
+          ═══════════════════════════════════════════════════════
+          INSTRUCCIONES PARA AÑADIR TU IMAGEN:
+          1. Sube tu imagen a la misma carpeta que este index.html
+          2. Cambia "TU_IMAGEN_AQUI.jpg" por el nombre de tu archivo
+          3. El placeholder desaparecerá automáticamente
+          ═══════════════════════════════════════════════════════
+        -->
+        <div class="product-img-frame" id="productFrame">
+          <img id="productImg" src="TU_IMAGEN_AQUI.jpg" alt="Chapa de perro con QR de PawTag" />
+          <!-- Placeholder visible hasta que pongas la imagen -->
+          <svg class="placeholder-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+            <rect x="5" y="5" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
+            <rect x="47" y="5" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
+            <rect x="5" y="47" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
+            <rect x="11" y="11" width="16" height="16" fill="#2D6A4F" opacity=".5"/>
+            <rect x="53" y="11" width="16" height="16" fill="#2D6A4F" opacity=".5"/>
+            <rect x="11" y="53" width="16" height="16" fill="#2D6A4F" opacity=".5"/>
+            <rect x="47" y="47" width="7" height="7" fill="#2D6A4F" opacity=".4"/>
+            <rect x="58" y="47" width="7" height="7" fill="#2D6A4F" opacity=".4"/>
+            <rect x="47" y="58" width="7" height="7" fill="#2D6A4F" opacity=".4"/>
+            <rect x="68" y="58" width="7" height="7" fill="#2D6A4F" opacity=".3"/>
+          </svg>
+          <p class="product-img-placeholder-txt">← Aquí irá tu foto de la chapa real</p>
+        </div>
+        <div class="scan-pulse">📱 Escanea el QR y pruébalo</div>
+      </div>
+
+      <div class="product-text reveal">
+        <span class="section-eyebrow">El producto</span>
+        <h2 class="section-title">Una chapa.<br/>Un QR. Todo lo que necesitas.</h2>
+        <p class="section-sub">
+          Cada PawTag lleva grabado un QR único. Al escanearlo, quien lo encuentre accede a la ficha de tu perro al instante — no necesita descargar ninguna app.
+        </p>
+        <ul class="product-features">
+          <li>
+            <span class="feat-dot">
+              <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5"/></svg>
+            </span>
+            <span><strong>Acero inoxidable</strong> — resistente al agua, al barro y a los juegos más salvajes</span>
+          </li>
+          <li>
+            <span class="feat-dot">
+              <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5"/></svg>
+            </span>
+            <span><strong>QR grabado con láser</strong> — no se borra ni con los años ni con los mordiscos</span>
+          </li>
+          <li>
+            <span class="feat-dot">
+              <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5"/></svg>
+            </span>
+            <span><strong>Página personalizada</strong> — nombre, foto, contacto y lo que quieras mostrar</span>
+          </li>
+          <li>
+            <span class="feat-dot">
+              <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5"/></svg>
+            </span>
+            <span><strong>Actualizable</strong> — si cambias de número, actualizas la ficha y el QR sigue funcionando</span>
+          </li>
+        </ul>
+        <div style="background:#EBF4EF;border-radius:12px;padding:1rem 1.3rem;border-left:4px solid var(--green);margin-top:.5rem">
+          <p style="font-size:.88rem;color:var(--green);font-weight:600;margin-bottom:.3rem">👇 ¿Curioso?</p>
+          <p style="font-size:.88rem;color:var(--muted)">Escanea el QR de la imagen y verás exactamente qué ve quien encuentra a tu perro — una de nuestras plantillas reales.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VENTAJAS ── -->
+  <section id="ventajas">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="centered reveal">
+        <span class="section-eyebrow">¿Por qué PawTag?</span>
+        <h2 class="section-title" style="color:#fff">Seguridad moderna<br/>para tu mejor amigo</h2>
+      </div>
+      <div class="benefits-grid" style="margin-top:3rem">
+        <div class="benefit-card reveal">
+          <div class="benefit-icon">⚡</div>
+          <h3>Contacto instantáneo</h3>
+          <p>Quien encuentre a tu perro te localiza en segundos. Sin papel, sin letras pequeñas ilegibles.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <div class="benefit-icon">🔒</div>
+          <h3>Tú controlas qué ven</h3>
+          <p>Decides exactamente qué información aparece. Tu privacidad, a tu manera.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <div class="benefit-icon">🌧️</div>
+          <h3>Para toda la vida</h3>
+          <p>Material de calidad que aguanta el campo, la playa y el invierno sin despeinarse.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <div class="benefit-icon">🎨</div>
+          <h3>Diseño a medida</h3>
+          <p>Personaliza forma, color e información. Cada PawTag es tan único como tu perro.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <div class="benefit-icon">📱</div>
+          <h3>Sin app necesaria</h3>
+          <p>Cualquier smartphone puede escanear el QR. No hace falta instalar nada.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <div class="benefit-icon">✏️</div>
+          <h3>Siempre actualizado</h3>
+          <p>¿Cambias de número? Actualiza la ficha online y el QR refleja los nuevos datos al momento.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section id="faq">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="centered reveal">
+        <span class="section-eyebrow">Preguntas frecuentes</span>
+        <h2 class="section-title">¿Tienes dudas?</h2>
+        <p class="section-sub">Las respuestas a lo que más nos preguntan</p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            ¿Qué pasa si cambio de número de teléfono?
+            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Ningún problema. La ficha de tu perro se actualiza fácilmente y el QR de la chapa siempre apuntará a los datos más recientes. No necesitas pedir una chapa nueva.</p>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            ¿La chapa aguanta el agua y el barro?
+            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Sí, fabricamos las chapas en acero inoxidable con grabado láser. El QR no se borra con el agua, el barro ni el uso diario. Está diseñada para durar tanto como tu perro la lleva.</p>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            ¿Necesita internet quien encuentra a mi perro?
+            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Solo necesita un smartphone con cámara (cualquier iPhone o Android moderno). La cámara reconoce el QR automáticamente y abre la ficha en el navegador. Sin apps, sin registros.</p>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            ¿Cuánto tarda en llegar el pedido?
+            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Escríbenos por WhatsApp y te indicamos el plazo exacto según stock y personalización. Habitualmente el proceso es rápido. ¡No dudes en consultarnos!</p>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            ¿Qué información puedo poner en la ficha?
+            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="faq-answer">
+            <p>Tú decides qué aparece: nombre del perro, foto, tu número de contacto, información médica relevante, dirección… Tenemos varias plantillas entre las que elegir y lo adaptamos a lo que necesites.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONTACTO ── -->
+  <section id="contacto">
+    <div class="contact-inner">
+      <div class="contact-text reveal">
+        <span class="section-eyebrow">Contacto</span>
+        <h2 class="section-title">¿Listo para proteger a tu perro?</h2>
+        <p>Escríbenos por WhatsApp o llámanos directamente. Te contamos todo sin compromiso y preparamos tu PawTag personalizada.</p>
+        <div class="contact-options">
+          <!-- ═══ CAMBIA EL NÚMERO AQUÍ ═══ -->
+          <!-- WhatsApp: sustituye 34XXXXXXXXX por tu número (código país + número, sin + ni espacios) -->
+          <!-- Teléfono: sustituye +34 XXX XXX XXX por tu número real -->
+          <a href="https://wa.me/34XXXXXXXXX?text=Hola!%20Me%20interesa%20una%20PawTag%20para%20mi%20perro%20%F0%9F%90%BE" class="contact-btn whatsapp" target="_blank" rel="noopener">
+            <span class="contact-btn-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.5 2C6.262 2 2 6.262 2 11.5c0 1.819.497 3.522 1.353 4.994L2 22l5.614-1.338A9.469 9.469 0 0011.5 21C16.738 21 21 16.738 21 11.5S16.738 2 11.5 2z"/></svg>
+            </span>
+            <span class="contact-btn-text">
+              <span>Escríbenos</span>
+              WhatsApp
+            </span>
+          </a>
+          <a href="tel:+34XXXXXXXXX" class="contact-btn phone">
+            <span class="contact-btn-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.02 1.18 2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14v2.92z"/></svg>
+            </span>
+            <span class="contact-btn-text">
+              <span>Llámanos</span>
+              +34 XXX XXX XXX
+            </span>
+          </a>
+        </div>
+      </div>
+      <div class="contact-visual reveal">
+        <div class="paw-circle">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="60" cy="76" rx="27" ry="24" fill="#2D6A4F" opacity=".25"/>
+            <ellipse cx="30" cy="55" rx="12" ry="14" fill="#2D6A4F" opacity=".25"/>
+            <ellipse cx="90" cy="55" rx="12" ry="14" fill="#2D6A4F" opacity=".25"/>
+            <ellipse cx="42" cy="36" rx="10" ry="13" fill="#2D6A4F" opacity=".25"/>
+            <ellipse cx="78" cy="36" rx="10" ry="13" fill="#2D6A4F" opacity=".25"/>
+          </svg>
+        </div>
+        <p>Respondemos rápido. Cuéntanos cómo se llama tu perro y qué diseño te gusta y te preparamos tu PawTag.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <a href="#" class="footer-logo">
+        <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="24" cy="29" rx="10" ry="9" fill="#40916C"/>
+          <ellipse cx="12" cy="22" rx="4.5" ry="5.5" fill="#40916C"/>
+          <ellipse cx="36" cy="22" rx="4.5" ry="5.5" fill="#40916C"/>
+          <ellipse cx="17" cy="16" rx="3.5" ry="4.5" fill="#40916C"/>
+          <ellipse cx="31" cy="16" rx="3.5" ry="4.5" fill="#40916C"/>
+        </svg>
+        <span>PawTag</span>
+      </a>
+      <p class="footer-tagline">La chapa que habla por tu perro 🐾</p>
+      <ul class="footer-links">
+        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#producto">El producto</a></li>
+        <li><a href="#ventajas">Ventajas</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+      <p class="footer-copy">© 2025 PawTag · Hecho con ❤️ para los que aman a sus perros</p>
+    </div>
+  </footer>
+
+  <!-- ── JAVASCRIPT ── -->
+  <script>
+    // ── Mobile menu ──
+    const hamburger = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+    function closeMobileMenu() { mobileMenu.classList.remove('open'); }
+
+    // ── Scroll reveal ──
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+
+    // ── FAQ accordion ──
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+        btn.setAttribute('aria-expanded', !isOpen);
+      });
+    });
+
+    // ── Smart image fallback (product section) ──
+    // Si tu imagen no existe, el placeholder se mantiene visible
+    const productImg = document.getElementById('productImg');
+    const productFrame = document.getElementById('productFrame');
+    productImg.addEventListener('load', () => {
+      productFrame.classList.add('has-img');
+    });
+    productImg.addEventListener('error', () => {
+      // imagen no encontrada → mantener placeholder
+      productFrame.classList.remove('has-img');
+    });
+    // Trigger check in case already cached
+    if (productImg.complete && productImg.naturalWidth > 0) {
+      productFrame.classList.add('has-img');
+    }
+
+    // ── Smooth active nav highlight ──
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 100) current = sec.id;
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--green)' : '';
+      });
+    }, { passive: true });
+  </script>
+</body>
+</html>
