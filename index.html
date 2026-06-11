@@ -177,19 +177,36 @@
     .hero-card-wrap {
       position: relative;
     }
-    .hero-img-placeholder {
+
+    /* ─── HERO IMAGE ─── */
+    .hero-img-box {
       width: 340px; height: 340px;
-      background: linear-gradient(135deg, #EBF4EF 0%, #D7EDDF 100%);
       border-radius: 28px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 12px; box-shadow: var(--shadow);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: linear-gradient(135deg, #EBF4EF 0%, #D7EDDF 100%);
       border: 2px dashed rgba(45,106,79,.25);
-      position: relative;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px; position: relative;
     }
-    .hero-img-placeholder svg { width: 72px; height: 72px; opacity: .4; }
-    .hero-img-placeholder p {
+    /* Imagen real de la chapa en el hero */
+    .hero-img-box img {
+      width: 100%; height: 100%; object-fit: cover;
+      border-radius: 26px;
+      /* Descomenta la línea de abajo cuando tengas la imagen:
+         display: block;
+         Mientras tanto se muestra el placeholder: */
+      display: none;
+    }
+    .hero-img-placeholder-inner {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .hero-img-placeholder-inner svg { width: 72px; height: 72px; opacity: .4; }
+    .hero-img-placeholder-inner p {
       color: var(--muted); font-size: .85rem; text-align: center; max-width: 200px;
     }
+
     .hero-badge {
       position: absolute; bottom: -16px; right: -16px;
       background: var(--amber); color: #fff;
@@ -260,29 +277,29 @@
     .product-img-wrap {
       position: relative; display: flex; justify-content: center;
     }
+
+    /* ─── PRODUCT IMAGE ─── */
     .product-img-frame {
       width: 100%; max-width: 420px;
       aspect-ratio: 1;
-      background: linear-gradient(135deg, #EBF4EF, #D0EAD8);
       border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: linear-gradient(135deg, #EBF4EF, #D0EAD8);
+      border: 2px dashed rgba(45,106,79,.3);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 1rem; box-shadow: var(--shadow);
-      padding: 2rem; text-align: center;
-      border: 2px dashed rgba(45,106,79,.3);
+      gap: 1rem; padding: 2rem; text-align: center;
     }
+    /* Imagen real del producto */
     .product-img-frame img {
-      width: 100%; height: 100%;
-      object-fit: contain; border-radius: 16px;
-      display: none; /* se muestra con JS si src existe */
+      width: 100%; height: 100%; object-fit: contain; border-radius: 16px;
+      /* Cambia a display:block cuando añadas la imagen */
+      display: none;
     }
     .product-img-placeholder-txt {
       color: var(--muted); font-size: .82rem;
     }
-    /* cuando hay imagen real */
-    .product-img-frame.has-img img { display: block; }
-    .product-img-frame.has-img .product-img-placeholder-txt { display: none; }
-    .product-img-frame.has-img svg.placeholder-svg { display: none; }
 
     .scan-pulse {
       position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
@@ -323,8 +340,11 @@
     #ventajas .section-eyebrow { color: var(--amber); }
     #ventajas .section-title { color: #fff; }
     #ventajas .section-sub { color: rgba(255,255,255,.75); }
+
+    /* Forzamos exactamente 3 columnas en escritorio */
     .benefits-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem; margin-top: 3rem;
     }
     .benefit-card {
@@ -336,6 +356,63 @@
     .benefit-icon { font-size: 2rem; margin-bottom: .8rem; }
     .benefit-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; color: #fff; }
     .benefit-card p { font-size: .88rem; color: rgba(255,255,255,.7); line-height: 1.6; }
+
+    /* ── REVIEWS ── */
+    #reviews { background: var(--bg); }
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem; margin-top: 3.5rem;
+    }
+    .review-card {
+      background: var(--card); border-radius: var(--radius);
+      padding: 1.8rem; border: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 1rem;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .review-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+    .review-stars {
+      display: flex; gap: 3px;
+    }
+    .review-stars svg { width: 18px; height: 18px; fill: var(--amber); }
+    .review-text {
+      font-size: .95rem; color: var(--muted); line-height: 1.7;
+      flex: 1;
+    }
+    .review-author {
+      display: flex; align-items: center; gap: 12px;
+      border-top: 1px solid var(--border); padding-top: 1rem;
+    }
+    /* ─── AVATAR IMAGE ─── */
+    .review-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      overflow: hidden; flex-shrink: 0;
+      background: linear-gradient(135deg, #EBF4EF, #D0EAD8);
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* Imagen del avatar de cada reviewer */
+    .review-avatar img {
+      width: 100%; height: 100%; object-fit: cover;
+      border-radius: 50%;
+      /* Cambia a display:block cuando añadas el avatar */
+      display: none;
+    }
+    .review-avatar-placeholder {
+      font-size: 1.1rem;
+    }
+    .review-author-info strong {
+      display: block; font-size: .92rem; font-weight: 700; color: var(--text);
+    }
+    .review-author-info span {
+      font-size: .8rem; color: var(--muted);
+    }
+    .review-dog-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #EBF4EF; color: var(--green);
+      font-size: .72rem; font-weight: 600;
+      padding: .25rem .65rem; border-radius: 50px;
+      margin-left: auto; flex-shrink: 0;
+    }
 
     /* ── FAQ ── */
     #faq { background: #fff; }
@@ -450,6 +527,11 @@
     .reveal.visible { opacity: 1; transform: none; }
 
     /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .benefits-grid { grid-template-columns: repeat(2, 1fr); }
+      .reviews-grid  { grid-template-columns: repeat(2, 1fr); }
+    }
+
     @media (max-width: 860px) {
       .nav-links { display: none; }
       .hamburger { display: flex; }
@@ -457,11 +539,16 @@
       .hero-sub { margin: 0 auto 2rem; }
       .hero-actions { justify-content: center; }
       .hero-visual { order: -1; }
-      .hero-img-placeholder { width: 280px; height: 280px; }
+      .hero-img-box { width: 280px; height: 280px; }
       .product-inner { grid-template-columns: 1fr; gap: 3rem; }
       .product-text { padding-left: 0; }
       .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
       .contact-visual { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .benefits-grid { grid-template-columns: 1fr; }
+      .reviews-grid  { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 480px) {
@@ -481,7 +568,6 @@
   <!-- ── NAVBAR ── -->
   <nav>
     <a href="#" class="nav-logo">
-      <!-- Paw icon -->
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="24" cy="29" rx="10" ry="9" fill="#2D6A4F"/>
         <ellipse cx="12" cy="22" rx="4.5" ry="5.5" fill="#2D6A4F"/>
@@ -495,6 +581,7 @@
       <li><a href="#como-funciona">Cómo funciona</a></li>
       <li><a href="#producto">El producto</a></li>
       <li><a href="#ventajas">Ventajas</a></li>
+      <li><a href="#reviews">Opiniones</a></li>
       <li><a href="#faq">FAQ</a></li>
       <li><a href="#contacto" class="nav-cta">Pedir ahora</a></li>
     </ul>
@@ -508,13 +595,13 @@
     <a href="#como-funciona" onclick="closeMobileMenu()">Cómo funciona</a>
     <a href="#producto" onclick="closeMobileMenu()">El producto</a>
     <a href="#ventajas" onclick="closeMobileMenu()">Ventajas</a>
+    <a href="#reviews" onclick="closeMobileMenu()">Opiniones</a>
     <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
     <a href="#contacto" onclick="closeMobileMenu()">Pedir ahora</a>
   </div>
 
   <!-- ── HERO ── -->
   <section id="hero">
-    <!-- Huge paw watermark -->
     <svg class="hero-paw" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <ellipse cx="100" cy="125" rx="45" ry="40" fill="#2D6A4F"/>
       <ellipse cx="47" cy="88" rx="20" ry="24" fill="#2D6A4F"/>
@@ -548,21 +635,32 @@
 
       <div class="hero-visual">
         <div class="hero-card-wrap">
-          <div class="hero-img-placeholder">
-            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="8" y="8" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
-              <rect x="36" y="8" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
-              <rect x="8" y="36" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
-              <rect x="12" y="12" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
-              <rect x="40" y="12" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
-              <rect x="12" y="40" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
-              <rect x="36" y="36" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
-              <rect x="44" y="36" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
-              <rect x="36" y="44" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
-              <rect x="44" y="44" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
-              <rect x="55" y="44" width="5" height="5" fill="#2D6A4F" opacity=".3"/>
-            </svg>
-            <p>Tu imagen de chapa aparecerá aquí</p>
+          <div class="hero-img-box">
+            <!--
+              ═══════════════════════════════════════════════════════
+              IMAGEN HERO (foto principal de la chapa/perro)
+              Sustituye "hero.jpg" por el nombre de tu imagen.
+              Cuando añadas la imagen, cambia display:none a display:block
+              en el CSS de .hero-img-box img (o ponlo en el atributo style).
+              ═══════════════════════════════════════════════════════
+            -->
+            <img src="hero.jpg" alt="Chapa PawTag en el collar de un perro" style="display:none" />
+            <!-- Placeholder visible hasta que pongas la imagen -->
+            <div class="hero-img-placeholder-inner">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="8" y="8" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
+                <rect x="36" y="8" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
+                <rect x="8" y="36" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
+                <rect x="12" y="12" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
+                <rect x="40" y="12" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
+                <rect x="12" y="40" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
+                <rect x="36" y="36" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
+                <rect x="44" y="36" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
+                <rect x="36" y="44" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
+                <rect x="44" y="44" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
+              </svg>
+              <p>Tu imagen de chapa aparecerá aquí</p>
+            </div>
           </div>
           <div class="hero-badge">QR<br/>VIVO</div>
         </div>
@@ -627,18 +725,18 @@
   <section id="producto">
     <div class="product-inner">
       <div class="product-img-wrap reveal">
-        <!--
-          ═══════════════════════════════════════════════════════
-          INSTRUCCIONES PARA AÑADIR TU IMAGEN:
-          1. Sube tu imagen a la misma carpeta que este index.html
-          2. Cambia "TU_IMAGEN_AQUI.jpg" por el nombre de tu archivo
-          3. El placeholder desaparecerá automáticamente
-          ═══════════════════════════════════════════════════════
-        -->
-        <div class="product-img-frame" id="productFrame">
-          <img id="productImg" src="TU_IMAGEN_AQUI.jpg" alt="Chapa de perro con QR de PawTag" />
+        <div class="product-img-frame">
+          <!--
+            ═══════════════════════════════════════════════════════
+            IMAGEN PRODUCTO (foto de la chapa física)
+            Sustituye "producto.jpg" por el nombre de tu imagen.
+            Cuando añadas la imagen, cambia display:none a display:block
+            en el atributo style de abajo.
+            ═══════════════════════════════════════════════════════
+          -->
+          <img src="producto.jpg" alt="Chapa de perro con QR de PawTag" style="display:none" />
           <!-- Placeholder visible hasta que pongas la imagen -->
-          <svg class="placeholder-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
             <rect x="5" y="5" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
             <rect x="47" y="5" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
             <rect x="5" y="47" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
@@ -737,6 +835,194 @@
     </div>
   </section>
 
+  <!-- ── REVIEWS ── -->
+  <section id="reviews">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="centered reveal">
+        <span class="section-eyebrow">Opiniones reales</span>
+        <h2 class="section-title">Lo que dicen<br/>los dueños</h2>
+        <p class="section-sub">Familias que ya llevan su PawTag — y no conciben salir sin ella</p>
+      </div>
+      <div class="reviews-grid">
+
+        <!-- Review 1 -->
+        <div class="review-card reveal">
+          <div class="review-stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">
+            "Bruno se escapó en el parque y al cabo de media hora me llamaron. El vecino que lo encontró escaneó el QR y me escribió al momento. Sin la PawTag no sé cómo habría acabado."
+          </p>
+          <div class="review-author">
+            <div class="review-avatar">
+              <!--
+                AVATAR 1: Sustituye "avatar1.jpg" por tu imagen.
+                Cambia style="display:none" a style="display:block" cuando la añadas.
+              -->
+              <img src="avatar1.jpg" alt="Foto de Laura M." style="display:none" />
+              <span class="review-avatar-placeholder">🙋‍♀️</span>
+            </div>
+            <div class="review-author-info">
+              <strong>Laura M.</strong>
+              <span>Madrid</span>
+            </div>
+            <span class="review-dog-tag">🐕 Bruno</span>
+          </div>
+        </div>
+
+        <!-- Review 2 -->
+        <div class="review-card reveal">
+          <div class="review-stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">
+            "La calidad del acero es brutal. Lleva seis meses mojándose, revolcándose en el barro y todavía como nueva. El QR se lee perfectamente. Muy recomendable."
+          </p>
+          <div class="review-author">
+            <div class="review-avatar">
+              <!--
+                AVATAR 2: Sustituye "avatar2.jpg" por tu imagen.
+                Cambia style="display:none" a style="display:block" cuando la añadas.
+              -->
+              <img src="avatar2.jpg" alt="Foto de Javi R." style="display:none" />
+              <span class="review-avatar-placeholder">🙋‍♂️</span>
+            </div>
+            <div class="review-author-info">
+              <strong>Javi R.</strong>
+              <span>Barcelona</span>
+            </div>
+            <span class="review-dog-tag">🐕 Nala</span>
+          </div>
+        </div>
+
+        <!-- Review 3 -->
+        <div class="review-card reveal">
+          <div class="review-stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">
+            "Cambié de número y actualicé la ficha en dos minutos desde el móvil. Sin pedir chapa nueva, sin complicaciones. Eso es lo que más me gusta: que no caduca nunca."
+          </p>
+          <div class="review-author">
+            <div class="review-avatar">
+              <!--
+                AVATAR 3: Sustituye "avatar3.jpg" por tu imagen.
+                Cambia style="display:none" a style="display:block" cuando la añadas.
+              -->
+              <img src="avatar3.jpg" alt="Foto de Marta G." style="display:none" />
+              <span class="review-avatar-placeholder">🙋‍♀️</span>
+            </div>
+            <div class="review-author-info">
+              <strong>Marta G.</strong>
+              <span>Valencia</span>
+            </div>
+            <span class="review-dog-tag">🐕 Simba</span>
+          </div>
+        </div>
+
+        <!-- Review 4 -->
+        <div class="review-card reveal">
+          <div class="review-stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">
+            "El diseño quedó precioso. Pusimos la foto de Kira en la ficha y cuando alguien la escanea, lo primero que ve es su carita. Un detalle que marca la diferencia."
+          </p>
+          <div class="review-author">
+            <div class="review-avatar">
+              <!--
+                AVATAR 4: Sustituye "avatar4.jpg" por tu imagen.
+                Cambia style="display:none" a style="display:block" cuando la añadas.
+              -->
+              <img src="avatar4.jpg" alt="Foto de Carlos P." style="display:none" />
+              <span class="review-avatar-placeholder">🙋‍♂️</span>
+            </div>
+            <div class="review-author-info">
+              <strong>Carlos P.</strong>
+              <span>Sevilla</span>
+            </div>
+            <span class="review-dog-tag">🐕 Kira</span>
+          </div>
+        </div>
+
+        <!-- Review 5 -->
+        <div class="review-card reveal">
+          <div class="review-stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">
+            "Me llegó en pocos días y perfectamente embalada. La atención por WhatsApp fue rapidísima y me ayudaron a configurar todo. Muy buena experiencia de principio a fin."
+          </p>
+          <div class="review-author">
+            <div class="review-avatar">
+              <!--
+                AVATAR 5: Sustituye "avatar5.jpg" por tu imagen.
+                Cambia style="display:none" a style="display:block" cuando la añadas.
+              -->
+              <img src="avatar5.jpg" alt="Foto de Ana T." style="display:none" />
+              <span class="review-avatar-placeholder">🙋‍♀️</span>
+            </div>
+            <div class="review-author-info">
+              <strong>Ana T.</strong>
+              <span>Bilbao</span>
+            </div>
+            <span class="review-dog-tag">🐕 Thor</span>
+          </div>
+        </div>
+
+        <!-- Review 6 -->
+        <div class="review-card reveal">
+          <div class="review-stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <p class="review-text">
+            "Ya tengo tres chapas, para mis tres perros. Cada una con su ficha propia. El precio es muy justo para lo que ofrece. Repetiré seguro si algún día necesito otra."
+          </p>
+          <div class="review-author">
+            <div class="review-avatar">
+              <!--
+                AVATAR 6: Sustituye "avatar6.jpg" por tu imagen.
+                Cambia style="display:none" a style="display:block" cuando la añadas.
+              -->
+              <img src="avatar6.jpg" alt="Foto de Roberto L." style="display:none" />
+              <span class="review-avatar-placeholder">🙋‍♂️</span>
+            </div>
+            <div class="review-author-info">
+              <strong>Roberto L.</strong>
+              <span>Zaragoza</span>
+            </div>
+            <span class="review-dog-tag">🐕 x3</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ── FAQ ── -->
   <section id="faq">
     <div style="max-width:1100px;margin:0 auto">
@@ -804,8 +1090,6 @@
         <p>Escríbenos por WhatsApp o llámanos directamente. Te contamos todo sin compromiso y preparamos tu PawTag personalizada.</p>
         <div class="contact-options">
           <!-- ═══ CAMBIA EL NÚMERO AQUÍ ═══ -->
-          <!-- WhatsApp: sustituye 34XXXXXXXXX por tu número (código país + número, sin + ni espacios) -->
-          <!-- Teléfono: sustituye +34 XXX XXX XXX por tu número real -->
           <a href="https://wa.me/34XXXXXXXXX?text=Hola!%20Me%20interesa%20una%20PawTag%20para%20mi%20perro%20%F0%9F%90%BE" class="contact-btn whatsapp" target="_blank" rel="noopener">
             <span class="contact-btn-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.5 2C6.262 2 2 6.262 2 11.5c0 1.819.497 3.522 1.353 4.994L2 22l5.614-1.338A9.469 9.469 0 0011.5 21C16.738 21 21 16.738 21 11.5S16.738 2 11.5 2z"/></svg>
@@ -859,6 +1143,7 @@
         <li><a href="#como-funciona">Cómo funciona</a></li>
         <li><a href="#producto">El producto</a></li>
         <li><a href="#ventajas">Ventajas</a></li>
+        <li><a href="#reviews">Opiniones</a></li>
         <li><a href="#contacto">Contacto</a></li>
       </ul>
       <p class="footer-copy">© 2025 PawTag · Hecho con ❤️ para los que aman a sus perros</p>
@@ -897,22 +1182,6 @@
         btn.setAttribute('aria-expanded', !isOpen);
       });
     });
-
-    // ── Smart image fallback (product section) ──
-    // Si tu imagen no existe, el placeholder se mantiene visible
-    const productImg = document.getElementById('productImg');
-    const productFrame = document.getElementById('productFrame');
-    productImg.addEventListener('load', () => {
-      productFrame.classList.add('has-img');
-    });
-    productImg.addEventListener('error', () => {
-      // imagen no encontrada → mantener placeholder
-      productFrame.classList.remove('has-img');
-    });
-    // Trigger check in case already cached
-    if (productImg.complete && productImg.naturalWidth > 0) {
-      productFrame.classList.add('has-img');
-    }
 
     // ── Smooth active nav highlight ──
     const sections = document.querySelectorAll('section[id]');
