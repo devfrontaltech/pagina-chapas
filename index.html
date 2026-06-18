@@ -2,1199 +2,336 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PawTag – La chapa que habla por tu perro</title>
-  <meta name="description" content="Chapas para perros con QR inteligente. Escanea y accede a toda la información de tu mascota al instante." />
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-
-  <style>
-    /* ── RESET & BASE ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-
-    :root {
-      --green:   #2D6A4F;
-      --green-l: #40916C;
-      --amber:   #F4A261;
-      --amber-d: #E07B39;
-      --bg:      #FAFAF8;
-      --card:    #FFFFFF;
-      --text:    #1A1A2E;
-      --muted:   #5E6074;
-      --border:  #E2E2DC;
-      --radius:  14px;
-      --shadow:  0 4px 24px rgba(0,0,0,.08);
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* ── NAVBAR ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 5%;
-      height: 68px;
-      background: rgba(250,250,248,.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none;
-    }
-    .nav-logo svg { width: 36px; height: 36px; }
-    .nav-logo span {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.35rem;
-      font-weight: 900;
-      color: var(--green);
-      letter-spacing: -0.5px;
-    }
-
-    .nav-links {
-      display: flex; align-items: center; gap: 2rem;
-      list-style: none;
-    }
-    .nav-links a {
-      text-decoration: none; font-size: .9rem; font-weight: 500;
-      color: var(--muted); transition: color .2s;
-    }
-    .nav-links a:hover { color: var(--green); }
-
-    .nav-cta {
-      background: var(--green); color: #fff !important;
-      padding: .5rem 1.2rem; border-radius: 50px;
-      font-weight: 600 !important; font-size: .88rem !important;
-      transition: background .2s !important;
-    }
-    .nav-cta:hover { background: var(--green-l) !important; }
-
-    .hamburger {
-      display: none; background: none; border: none; cursor: pointer;
-      flex-direction: column; gap: 5px; padding: 4px;
-    }
-    .hamburger span {
-      display: block; width: 24px; height: 2px;
-      background: var(--text); border-radius: 2px; transition: .3s;
-    }
-
-    .mobile-menu {
-      display: none; position: fixed; top: 68px; left: 0; right: 0;
-      background: var(--card); border-bottom: 1px solid var(--border);
-      padding: 1.5rem 5%; flex-direction: column; gap: 1.2rem; z-index: 99;
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a {
-      text-decoration: none; font-size: 1rem; font-weight: 500; color: var(--text);
-    }
-
-    /* ── HERO ── */
-    #hero {
-      min-height: 100vh;
-      display: flex; align-items: center;
-      padding: 100px 5% 60px;
-      position: relative; overflow: hidden;
-    }
-
-    .hero-paw {
-      position: absolute; right: -60px; top: 50%;
-      transform: translateY(-50%);
-      width: min(620px, 80vw); opacity: .055;
-      pointer-events: none; user-select: none;
-    }
-
-    .hero-inner {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 4rem; align-items: center;
-      max-width: 1100px; margin: 0 auto; width: 100%;
-      position: relative; z-index: 1;
-    }
-
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: #EBF4EF; color: var(--green);
-      font-size: .8rem; font-weight: 600; letter-spacing: .06em;
-      padding: .35rem .9rem; border-radius: 50px; margin-bottom: 1.2rem;
-      text-transform: uppercase;
-    }
-    .hero-eyebrow svg { width: 14px; height: 14px; }
-
-    .hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.4rem, 4.5vw, 3.8rem);
-      font-weight: 900; line-height: 1.1;
-      color: var(--text); margin-bottom: 1.2rem;
-    }
-    .hero-title em {
-      font-style: normal; color: var(--green);
-    }
-
-    .hero-sub {
-      font-size: 1.05rem; color: var(--muted);
-      max-width: 440px; margin-bottom: 2rem; line-height: 1.7;
-    }
-
-    .hero-actions {
-      display: flex; gap: 1rem; flex-wrap: wrap;
-    }
-
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--green); color: #fff;
-      padding: .85rem 1.8rem; border-radius: 50px;
-      font-weight: 600; font-size: .95rem; text-decoration: none;
-      transition: background .2s, transform .15s, box-shadow .2s;
-      box-shadow: 0 4px 16px rgba(45,106,79,.3);
-    }
-    .btn-primary:hover {
-      background: var(--green-l); transform: translateY(-2px);
-      box-shadow: 0 6px 22px rgba(45,106,79,.38);
-    }
-
-    .btn-secondary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: transparent; color: var(--text);
-      padding: .85rem 1.8rem; border-radius: 50px;
-      font-weight: 600; font-size: .95rem; text-decoration: none;
-      border: 2px solid var(--border); transition: border-color .2s, transform .15s;
-    }
-    .btn-secondary:hover { border-color: var(--green); transform: translateY(-2px); }
-
-    .hero-visual {
-      display: flex; justify-content: center; align-items: center;
-    }
-    .hero-card-wrap {
-      position: relative;
-    }
-
-    /* ─── HERO IMAGE ─── */
-    .hero-img-box {
-      width: 340px; height: 340px;
-      border-radius: 28px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      background: linear-gradient(135deg, #EBF4EF 0%, #D7EDDF 100%);
-      border: 2px dashed rgba(45,106,79,.25);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 12px; position: relative;
-    }
-    /* Imagen real de la chapa en el hero */
-    .hero-img-box img {
-      width: 100%; height: 100%; object-fit: cover;
-      border-radius: 26px;
-      /* Descomenta la línea de abajo cuando tengas la imagen:
-         display: block;
-         Mientras tanto se muestra el placeholder: */
-      display: none;
-    }
-    .hero-img-placeholder-inner {
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
-    }
-    .hero-img-placeholder-inner svg { width: 72px; height: 72px; opacity: .4; }
-    .hero-img-placeholder-inner p {
-      color: var(--muted); font-size: .85rem; text-align: center; max-width: 200px;
-    }
-
-    .hero-badge {
-      position: absolute; bottom: -16px; right: -16px;
-      background: var(--amber); color: #fff;
-      border-radius: 50%; width: 72px; height: 72px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      font-size: .62rem; font-weight: 700; text-align: center; line-height: 1.2;
-      box-shadow: 0 4px 14px rgba(244,162,97,.4);
-    }
-
-    /* ── SECTION BASE ── */
-    section { padding: 90px 5%; }
-    .section-eyebrow {
-      display: block; font-size: .78rem; font-weight: 700;
-      letter-spacing: .1em; text-transform: uppercase;
-      color: var(--green); margin-bottom: .6rem;
-    }
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.8rem, 3vw, 2.8rem);
-      font-weight: 900; line-height: 1.15;
-      margin-bottom: 1rem; color: var(--text);
-    }
-    .section-sub {
-      font-size: 1rem; color: var(--muted); max-width: 560px; line-height: 1.7;
-    }
-    .centered { text-align: center; }
-    .centered .section-sub { margin: 0 auto; }
-
-    /* ── HOW IT WORKS ── */
-    #como-funciona { background: #fff; }
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 2rem; margin-top: 3.5rem;
-    }
-    .step-card {
-      background: var(--bg); border-radius: var(--radius);
-      padding: 2rem; position: relative; overflow: hidden;
-      border: 1px solid var(--border);
-      transition: transform .2s, box-shadow .2s;
-    }
-    .step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-    .step-number {
-      font-family: 'Playfair Display', serif;
-      font-size: 3.5rem; font-weight: 900;
-      color: var(--green); opacity: .12;
-      position: absolute; top: 12px; right: 18px; line-height: 1;
-    }
-    .step-icon {
-      width: 48px; height: 48px;
-      background: #EBF4EF; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 1rem;
-    }
-    .step-icon svg { width: 24px; height: 24px; color: var(--green); }
-    .step-card h3 {
-      font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem;
-    }
-    .step-card p { font-size: .9rem; color: var(--muted); line-height: 1.6; }
-
-    /* ── PRODUCT / QR DEMO ── */
-    #producto { background: var(--bg); }
-    .product-inner {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 5rem; align-items: center;
-      max-width: 1100px; margin: 0 auto;
-    }
-    .product-img-wrap {
-      position: relative; display: flex; justify-content: center;
-    }
-
-    /* ─── PRODUCT IMAGE ─── */
-    .product-img-frame {
-      width: 100%; max-width: 420px;
-      aspect-ratio: 1;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      background: linear-gradient(135deg, #EBF4EF, #D0EAD8);
-      border: 2px dashed rgba(45,106,79,.3);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 1rem; padding: 2rem; text-align: center;
-    }
-    /* Imagen real del producto */
-    .product-img-frame img {
-      width: 100%; height: 100%; object-fit: contain; border-radius: 16px;
-      /* Cambia a display:block cuando añadas la imagen */
-      display: none;
-    }
-    .product-img-placeholder-txt {
-      color: var(--muted); font-size: .82rem;
-    }
-
-    .scan-pulse {
-      position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
-      background: var(--green); color: #fff;
-      border-radius: 50px; padding: .55rem 1.3rem;
-      font-size: .82rem; font-weight: 600;
-      display: flex; align-items: center; gap: 6px;
-      box-shadow: 0 4px 16px rgba(45,106,79,.3);
-      white-space: nowrap;
-    }
-    .scan-pulse::before {
-      content: ''; display: block; width: 8px; height: 8px;
-      background: var(--amber); border-radius: 50%;
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%,100% { opacity: 1; transform: scale(1); }
-      50% { opacity: .5; transform: scale(1.4); }
-    }
-
-    .product-text { padding-left: 1rem; }
-    .product-text .section-title { margin-bottom: 1.2rem; }
-    .product-features { list-style: none; display: flex; flex-direction: column; gap: .9rem; margin: 1.8rem 0; }
-    .product-features li {
-      display: flex; align-items: flex-start; gap: 12px;
-      font-size: .95rem; color: var(--muted);
-    }
-    .feat-dot {
-      flex-shrink: 0; width: 22px; height: 22px;
-      background: #EBF4EF; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin-top: 2px;
-    }
-    .feat-dot svg { width: 12px; height: 12px; color: var(--green); }
-
-    /* ── BENEFITS ── */
-    #ventajas { background: var(--green); color: #fff; }
-    #ventajas .section-eyebrow { color: var(--amber); }
-    #ventajas .section-title { color: #fff; }
-    #ventajas .section-sub { color: rgba(255,255,255,.75); }
-
-    /* Forzamos exactamente 3 columnas en escritorio */
-    .benefits-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem; margin-top: 3rem;
-    }
-    .benefit-card {
-      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
-      border-radius: var(--radius); padding: 1.8rem;
-      transition: background .2s, transform .2s;
-    }
-    .benefit-card:hover { background: rgba(255,255,255,.14); transform: translateY(-3px); }
-    .benefit-icon { font-size: 2rem; margin-bottom: .8rem; }
-    .benefit-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; color: #fff; }
-    .benefit-card p { font-size: .88rem; color: rgba(255,255,255,.7); line-height: 1.6; }
-
-    /* ── REVIEWS ── */
-    #reviews { background: var(--bg); }
-    .reviews-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem; margin-top: 3.5rem;
-    }
-    .review-card {
-      background: var(--card); border-radius: var(--radius);
-      padding: 1.8rem; border: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 1rem;
-      transition: transform .2s, box-shadow .2s;
-    }
-    .review-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-    .review-stars {
-      display: flex; gap: 3px;
-    }
-    .review-stars svg { width: 18px; height: 18px; fill: var(--amber); }
-    .review-text {
-      font-size: .95rem; color: var(--muted); line-height: 1.7;
-      flex: 1;
-    }
-    .review-author {
-      display: flex; align-items: center; gap: 12px;
-      border-top: 1px solid var(--border); padding-top: 1rem;
-    }
-    /* ─── AVATAR IMAGE ─── */
-    .review-avatar {
-      width: 44px; height: 44px; border-radius: 50%;
-      overflow: hidden; flex-shrink: 0;
-      background: linear-gradient(135deg, #EBF4EF, #D0EAD8);
-      display: flex; align-items: center; justify-content: center;
-    }
-    /* Imagen del avatar de cada reviewer */
-    .review-avatar img {
-      width: 100%; height: 100%; object-fit: cover;
-      border-radius: 50%;
-      /* Cambia a display:block cuando añadas el avatar */
-      display: none;
-    }
-    .review-avatar-placeholder {
-      font-size: 1.1rem;
-    }
-    .review-author-info strong {
-      display: block; font-size: .92rem; font-weight: 700; color: var(--text);
-    }
-    .review-author-info span {
-      font-size: .8rem; color: var(--muted);
-    }
-    .review-dog-tag {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: #EBF4EF; color: var(--green);
-      font-size: .72rem; font-weight: 600;
-      padding: .25rem .65rem; border-radius: 50px;
-      margin-left: auto; flex-shrink: 0;
-    }
-
-    /* ── FAQ ── */
-    #faq { background: #fff; }
-    .faq-list {
-      max-width: 700px; margin: 3rem auto 0;
-      display: flex; flex-direction: column; gap: 1rem;
-    }
-    .faq-item {
-      border: 1px solid var(--border); border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .faq-question {
-      width: 100%; background: none; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.2rem 1.5rem;
-      font-family: 'Inter', sans-serif; font-size: .97rem; font-weight: 600;
-      color: var(--text); text-align: left;
-      transition: background .15s;
-    }
-    .faq-question:hover { background: var(--bg); }
-    .faq-chevron { transition: transform .3s; flex-shrink: 0; }
-    .faq-item.open .faq-chevron { transform: rotate(180deg); }
-    .faq-answer {
-      max-height: 0; overflow: hidden; transition: max-height .35s ease;
-    }
-    .faq-item.open .faq-answer { max-height: 300px; }
-    .faq-answer p {
-      padding: 0 1.5rem 1.3rem; font-size: .92rem;
-      color: var(--muted); line-height: 1.7;
-    }
-
-    /* ── CONTACT ── */
-    #contacto { background: var(--bg); }
-    .contact-inner {
-      max-width: 900px; margin: 0 auto;
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 4rem; align-items: center;
-    }
-    .contact-text .section-title { margin-bottom: 1rem; }
-    .contact-text p { color: var(--muted); font-size: .97rem; line-height: 1.7; margin-bottom: 2rem; }
-    .contact-options {
-      display: flex; flex-direction: column; gap: 1rem;
-    }
-    .contact-btn {
-      display: flex; align-items: center; gap: 14px;
-      background: var(--card); border: 2px solid var(--border);
-      border-radius: var(--radius); padding: 1.1rem 1.4rem;
-      text-decoration: none; color: var(--text);
-      font-weight: 600; font-size: .95rem;
-      transition: border-color .2s, transform .15s, box-shadow .2s;
-    }
-    .contact-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-    .contact-btn.whatsapp:hover { border-color: #25D366; }
-    .contact-btn.phone:hover { border-color: var(--green); }
-    .contact-btn-icon {
-      width: 44px; height: 44px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .contact-btn.whatsapp .contact-btn-icon { background: #E8FAF0; }
-    .contact-btn.phone .contact-btn-icon { background: #EBF4EF; }
-    .contact-btn-text span:first-child { display: block; font-size: .75rem; color: var(--muted); font-weight: 500; }
-
-    .contact-visual {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 1.5rem; text-align: center;
-    }
-    .paw-circle {
-      width: 180px; height: 180px; border-radius: 50%;
-      background: linear-gradient(135deg, #EBF4EF, #D0EAD8);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .paw-circle svg { width: 90px; height: 90px; }
-    .contact-visual p { color: var(--muted); font-size: .88rem; line-height: 1.6; max-width: 240px; }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--text); color: rgba(255,255,255,.6);
-      padding: 3rem 5%;
-    }
-    .footer-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; flex-direction: column; align-items: center;
-      gap: 1.5rem; text-align: center;
-    }
-    .footer-logo {
-      display: flex; align-items: center; gap: 10px; text-decoration: none;
-    }
-    .footer-logo span {
-      font-family: 'Playfair Display', serif; font-size: 1.4rem;
-      font-weight: 900; color: #fff;
-    }
-    .footer-tagline { font-size: .88rem; }
-    .footer-links {
-      display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; justify-content: center;
-    }
-    .footer-links a {
-      text-decoration: none; color: rgba(255,255,255,.5);
-      font-size: .85rem; transition: color .2s;
-    }
-    .footer-links a:hover { color: #fff; }
-    .footer-copy { font-size: .8rem; }
-
-    /* ── SCROLL ANIMATIONS ── */
-    .reveal {
-      opacity: 0; transform: translateY(28px);
-      transition: opacity .6s ease, transform .6s ease;
-    }
-    .reveal.visible { opacity: 1; transform: none; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      .benefits-grid { grid-template-columns: repeat(2, 1fr); }
-      .reviews-grid  { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 860px) {
-      .nav-links { display: none; }
-      .hamburger { display: flex; }
-      .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 2.5rem; }
-      .hero-sub { margin: 0 auto 2rem; }
-      .hero-actions { justify-content: center; }
-      .hero-visual { order: -1; }
-      .hero-img-box { width: 280px; height: 280px; }
-      .product-inner { grid-template-columns: 1fr; gap: 3rem; }
-      .product-text { padding-left: 0; }
-      .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-      .contact-visual { display: none; }
-    }
-
-    @media (max-width: 600px) {
-      .benefits-grid { grid-template-columns: 1fr; }
-      .reviews-grid  { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 480px) {
-      section { padding: 70px 6%; }
-      .hero-title { font-size: 2.1rem; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .reveal { opacity: 1; transform: none; transition: none; }
-      * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StayRules · Panel de gestión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/panel.css"/>
 </head>
-
 <body>
 
-  <!-- ── NAVBAR ── -->
-  <nav>
-    <a href="#" class="nav-logo">
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="24" cy="29" rx="10" ry="9" fill="#2D6A4F"/>
-        <ellipse cx="12" cy="22" rx="4.5" ry="5.5" fill="#2D6A4F"/>
-        <ellipse cx="36" cy="22" rx="4.5" ry="5.5" fill="#2D6A4F"/>
-        <ellipse cx="17" cy="16" rx="3.5" ry="4.5" fill="#2D6A4F"/>
-        <ellipse cx="31" cy="16" rx="3.5" ry="4.5" fill="#2D6A4F"/>
-      </svg>
-      <span>PawTag</span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="#como-funciona">Cómo funciona</a></li>
-      <li><a href="#producto">El producto</a></li>
-      <li><a href="#ventajas">Ventajas</a></li>
-      <li><a href="#reviews">Opiniones</a></li>
-      <li><a href="#faq">FAQ</a></li>
-      <li><a href="#contacto" class="nav-cta">Pedir ahora</a></li>
-    </ul>
-    <button class="hamburger" id="hamburgerBtn" aria-label="Menú">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen" class="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="brand-icon">⌂</span>
+        <span class="brand-name">StayRules</span>
+      </div>
+      <h1 class="auth-title">Bienvenido de nuevo</h1>
+      <p class="auth-sub">Gestiona las normas de todos tus apartamentos</p>
 
-  <!-- ── MOBILE MENU ── -->
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="#como-funciona" onclick="closeMobileMenu()">Cómo funciona</a>
-    <a href="#producto" onclick="closeMobileMenu()">El producto</a>
-    <a href="#ventajas" onclick="closeMobileMenu()">Ventajas</a>
-    <a href="#reviews" onclick="closeMobileMenu()">Opiniones</a>
-    <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
-    <a href="#contacto" onclick="closeMobileMenu()">Pedir ahora</a>
+      <div id="auth-tabs" class="auth-tabs">
+        <button class="tab-btn active" data-tab="login">Entrar</button>
+        <button class="tab-btn" data-tab="register">Registrarse</button>
+      </div>
+
+      <div id="login-form" class="auth-form active">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="tu@email.com"/>
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input type="password" id="login-pass" placeholder="••••••••"/>
+        </div>
+        <button class="btn-primary full" id="btn-login">Entrar</button>
+        <div class="auth-divider"><span>o</span></div>
+        <button class="btn-google full" id="btn-google-login">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continuar con Google
+        </button>
+      </div>
+
+      <div id="register-form" class="auth-form">
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" id="reg-name" placeholder="Tu nombre"/>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="tu@email.com"/>
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres"/>
+        </div>
+        <button class="btn-primary full" id="btn-register">Crear cuenta</button>
+        <div class="auth-divider"><span>o</span></div>
+        <button class="btn-google full" id="btn-google-register">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Registrarse con Google
+        </button>
+      </div>
+
+      <div id="auth-error" class="auth-error hidden"></div>
+
+      <div class="auth-legal">
+        <a href="privacidad.html" target="_blank">Privacidad</a>
+        <span>·</span>
+        <a href="terminos.html" target="_blank">Términos</a>
+        <span>·</span>
+        <a href="cookies.html" target="_blank">Cookies</a>
+      </div>
+    </div>
+    <div class="auth-visual">
+      <div class="visual-card vc1">
+        <span class="vc-emoji">🏠</span>
+        <span>Casa del Lago · Barcelona</span>
+      </div>
+      <div class="visual-card vc2">
+        <span class="vc-emoji">📶</span>
+        <span>WiFi: MiCasa2024</span>
+      </div>
+      <div class="visual-card vc3">
+        <span class="vc-emoji">🔑</span>
+        <span>Check-in: 15:00h</span>
+      </div>
+      <div class="visual-tagline">
+        <h2>Un QR.<br/>Todas las normas.</h2>
+        <p>Tus huéspedes siempre informados.</p>
+      </div>
+    </div>
   </div>
 
-  <!-- ── HERO ── -->
-  <section id="hero">
-    <svg class="hero-paw" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <ellipse cx="100" cy="125" rx="45" ry="40" fill="#2D6A4F"/>
-      <ellipse cx="47" cy="88" rx="20" ry="24" fill="#2D6A4F"/>
-      <ellipse cx="153" cy="88" rx="20" ry="24" fill="#2D6A4F"/>
-      <ellipse cx="68" cy="60" rx="16" ry="20" fill="#2D6A4F"/>
-      <ellipse cx="132" cy="60" rx="16" ry="20" fill="#2D6A4F"/>
-    </svg>
+  <!-- MAIN APP -->
+  <div id="app" class="hidden">
 
-    <div class="hero-inner">
-      <div class="hero-content">
-        <span class="hero-eyebrow">
-          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 8a5 5 0 0110 0v1H3V8z"/></svg>
-          Seguridad para tu mascota
-        </span>
-        <h1 class="hero-title">
-          La chapa que<br/>
-          <em>habla por</em><br/>
-          tu perro
-        </h1>
-        <p class="hero-sub">
-          Un QR inteligente en su collar. Cualquiera que lo encuentre puede ver sus datos de contacto al instante — sin apps, sin complicaciones.
-        </p>
-        <div class="hero-actions">
-          <a href="#contacto" class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.5 2C6.262 2 2 6.262 2 11.5c0 1.819.497 3.522 1.353 4.994L2 22l5.614-1.338A9.469 9.469 0 0011.5 21C16.738 21 21 16.738 21 11.5S16.738 2 11.5 2z"/></svg>
-            Pedir por WhatsApp
-          </a>
-          <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
-        </div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">⌂</span>
+        <span class="brand-name">StayRules</span>
       </div>
-
-      <div class="hero-visual">
-        <div class="hero-card-wrap">
-          <div class="hero-img-box">
-            <!--
-              ═══════════════════════════════════════════════════════
-              IMAGEN HERO (foto principal de la chapa/perro)
-              Sustituye "hero.jpg" por el nombre de tu imagen.
-              Cuando añadas la imagen, cambia display:none a display:block
-              en el CSS de .hero-img-box img (o ponlo en el atributo style).
-              ═══════════════════════════════════════════════════════
-            -->
-            <img src="hero.jpg" alt="Chapa PawTag en el collar de un perro" style="display:none" />
-            <!-- Placeholder visible hasta que pongas la imagen -->
-            <div class="hero-img-placeholder-inner">
-              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="8" y="8" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
-                <rect x="36" y="8" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
-                <rect x="8" y="36" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
-                <rect x="12" y="12" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
-                <rect x="40" y="12" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
-                <rect x="12" y="40" width="12" height="12" fill="#2D6A4F" opacity=".6"/>
-                <rect x="36" y="36" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
-                <rect x="44" y="36" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
-                <rect x="36" y="44" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
-                <rect x="44" y="44" width="5" height="5" fill="#2D6A4F" opacity=".5"/>
-              </svg>
-              <p>Tu imagen de chapa aparecerá aquí</p>
-            </div>
-          </div>
-          <div class="hero-badge">QR<br/>VIVO</div>
-        </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-link active" data-view="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Mis apartamentos
+        </a>
+        <a href="#" class="nav-link" data-view="nuevo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Nuevo apartamento
+        </a>
+      </nav>
+      <div class="sidebar-middle">
+        <a href="#" class="nav-link nav-link-cancel" id="btn-cancel-sub">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Cancelar suscripción
+        </a>
       </div>
-    </div>
-  </section>
-
-  <!-- ── HOW IT WORKS ── -->
-  <section id="como-funciona">
-    <div style="max-width:1100px;margin:0 auto">
-      <div class="centered reveal">
-        <span class="section-eyebrow">El proceso</span>
-        <h2 class="section-title">Tan fácil como 1, 2, 3</h2>
-        <p class="section-sub">En pocos pasos tu perro lleva su ficha completa colgando del collar</p>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar">U</div>
+          <div class="user-details">
+            <span id="user-name-sidebar">Usuario</span>
+            <span id="user-email-sidebar" class="user-email-small"></span>
+          </div>
+        </div>
+        <button class="btn-logout" id="btn-logout" title="Cerrar sesión">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
       </div>
-      <div class="steps-grid">
-        <div class="step-card reveal">
-          <span class="step-number">1</span>
-          <div class="step-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <h3>Eliges el diseño</h3>
-          <p>Escoge entre nuestras plantillas o dinos cómo quieres tu chapa. La personalizamos a tu gusto.</p>
-        </div>
-        <div class="step-card reveal">
-          <span class="step-number">2</span>
-          <div class="step-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
-            </svg>
-          </div>
-          <h3>Rellenamos la ficha</h3>
-          <p>Nombre del perro, tu número de teléfono, información médica… lo que tú decidas mostrar.</p>
-        </div>
-        <div class="step-card reveal">
-          <span class="step-number">3</span>
-          <div class="step-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-            </svg>
-          </div>
-          <h3>La recibes en casa</h3>
-          <p>Te enviamos la chapa lista. Pónsela al collar y el QR ya está activo para quien la escanee.</p>
-        </div>
-        <div class="step-card reveal">
-          <span class="step-number">4</span>
-          <div class="step-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-            </svg>
-          </div>
-          <h3>¡Tu perro está seguro!</h3>
-          <p>Si alguna vez se pierde, cualquiera puede escanear el QR y localizarte en segundos.</p>
-        </div>
+    </aside>
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+      <button class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="sidebar-brand">
+        <span class="brand-icon">⌂</span>
+        <span class="brand-name">StayRules</span>
       </div>
-    </div>
-  </section>
+      <div class="user-avatar small" id="user-avatar-mobile">U</div>
+    </header>
 
-  <!-- ── PRODUCT + QR DEMO ── -->
-  <section id="producto">
-    <div class="product-inner">
-      <div class="product-img-wrap reveal">
-        <div class="product-img-frame">
-          <!--
-            ═══════════════════════════════════════════════════════
-            IMAGEN PRODUCTO (foto de la chapa física)
-            Sustituye "producto.jpg" por el nombre de tu imagen.
-            Cuando añadas la imagen, cambia display:none a display:block
-            en el atributo style de abajo.
-            ═══════════════════════════════════════════════════════
-          -->
-          <img src="producto.jpg" alt="Chapa de perro con QR de PawTag" style="display:none" />
-          <!-- Placeholder visible hasta que pongas la imagen -->
-          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
-            <rect x="5" y="5" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
-            <rect x="47" y="5" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
-            <rect x="5" y="47" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
-            <rect x="11" y="11" width="16" height="16" fill="#2D6A4F" opacity=".5"/>
-            <rect x="53" y="11" width="16" height="16" fill="#2D6A4F" opacity=".5"/>
-            <rect x="11" y="53" width="16" height="16" fill="#2D6A4F" opacity=".5"/>
-            <rect x="47" y="47" width="7" height="7" fill="#2D6A4F" opacity=".4"/>
-            <rect x="58" y="47" width="7" height="7" fill="#2D6A4F" opacity=".4"/>
-            <rect x="47" y="58" width="7" height="7" fill="#2D6A4F" opacity=".4"/>
-            <rect x="68" y="58" width="7" height="7" fill="#2D6A4F" opacity=".3"/>
-          </svg>
-          <p class="product-img-placeholder-txt">← Aquí irá tu foto de la chapa real</p>
-        </div>
-        <div class="scan-pulse">📱 Escanea el QR y pruébalo</div>
-      </div>
+    <!-- CONTENT -->
+    <main class="main-content">
 
-      <div class="product-text reveal">
-        <span class="section-eyebrow">El producto</span>
-        <h2 class="section-title">Una chapa.<br/>Un QR. Todo lo que necesitas.</h2>
-        <p class="section-sub">
-          Cada PawTag lleva grabado un QR único. Al escanearlo, quien lo encuentre accede a la ficha de tu perro al instante — no necesita descargar ninguna app.
-        </p>
-        <ul class="product-features">
-          <li>
-            <span class="feat-dot">
-              <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5"/></svg>
-            </span>
-            <span><strong>Acero inoxidable</strong> — resistente al agua, al barro y a los juegos más salvajes</span>
-          </li>
-          <li>
-            <span class="feat-dot">
-              <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5"/></svg>
-            </span>
-            <span><strong>QR grabado con láser</strong> — no se borra ni con los años ni con los mordiscos</span>
-          </li>
-          <li>
-            <span class="feat-dot">
-              <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5"/></svg>
-            </span>
-            <span><strong>Página personalizada</strong> — nombre, foto, contacto y lo que quieras mostrar</span>
-          </li>
-          <li>
-            <span class="feat-dot">
-              <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 6l3 3 5-5"/></svg>
-            </span>
-            <span><strong>Actualizable</strong> — si cambias de número, actualizas la ficha y el QR sigue funcionando</span>
-          </li>
-        </ul>
-        <div style="background:#EBF4EF;border-radius:12px;padding:1rem 1.3rem;border-left:4px solid var(--green);margin-top:.5rem">
-          <p style="font-size:.88rem;color:var(--green);font-weight:600;margin-bottom:.3rem">👇 ¿Curioso?</p>
-          <p style="font-size:.88rem;color:var(--muted)">Escanea el QR de la imagen y verás exactamente qué ve quien encuentra a tu perro — una de nuestras plantillas reales.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── VENTAJAS ── -->
-  <section id="ventajas">
-    <div style="max-width:1100px;margin:0 auto">
-      <div class="centered reveal">
-        <span class="section-eyebrow">¿Por qué PawTag?</span>
-        <h2 class="section-title" style="color:#fff">Seguridad moderna<br/>para tu mejor amigo</h2>
-      </div>
-      <div class="benefits-grid" style="margin-top:3rem">
-        <div class="benefit-card reveal">
-          <div class="benefit-icon">⚡</div>
-          <h3>Contacto instantáneo</h3>
-          <p>Quien encuentre a tu perro te localiza en segundos. Sin papel, sin letras pequeñas ilegibles.</p>
-        </div>
-        <div class="benefit-card reveal">
-          <div class="benefit-icon">🔒</div>
-          <h3>Tú controlas qué ven</h3>
-          <p>Decides exactamente qué información aparece. Tu privacidad, a tu manera.</p>
-        </div>
-        <div class="benefit-card reveal">
-          <div class="benefit-icon">🌧️</div>
-          <h3>Para toda la vida</h3>
-          <p>Material de calidad que aguanta el campo, la playa y el invierno sin despeinarse.</p>
-        </div>
-        <div class="benefit-card reveal">
-          <div class="benefit-icon">🎨</div>
-          <h3>Diseño a medida</h3>
-          <p>Personaliza forma, color e información. Cada PawTag es tan único como tu perro.</p>
-        </div>
-        <div class="benefit-card reveal">
-          <div class="benefit-icon">📱</div>
-          <h3>Sin app necesaria</h3>
-          <p>Cualquier smartphone puede escanear el QR. No hace falta instalar nada.</p>
-        </div>
-        <div class="benefit-card reveal">
-          <div class="benefit-icon">✏️</div>
-          <h3>Siempre actualizado</h3>
-          <p>¿Cambias de número? Actualiza la ficha online y el QR refleja los nuevos datos al momento.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── REVIEWS ── -->
-  <section id="reviews">
-    <div style="max-width:1100px;margin:0 auto">
-      <div class="centered reveal">
-        <span class="section-eyebrow">Opiniones reales</span>
-        <h2 class="section-title">Lo que dicen<br/>los dueños</h2>
-        <p class="section-sub">Familias que ya llevan su PawTag — y no conciben salir sin ella</p>
-      </div>
-      <div class="reviews-grid">
-
-        <!-- Review 1 -->
-        <div class="review-card reveal">
-          <div class="review-stars">
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <!-- DASHBOARD VIEW -->
+      <div id="view-dashboard" class="view active">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Mis apartamentos</h1>
+            <p class="page-sub">Gestiona y comparte las normas de cada alojamiento</p>
           </div>
-          <p class="review-text">
-            "Bruno se escapó en el parque y al cabo de media hora me llamaron. El vecino que lo encontró escaneó el QR y me escribió al momento. Sin la PawTag no sé cómo habría acabado."
-          </p>
-          <div class="review-author">
-            <div class="review-avatar">
-              <!--
-                AVATAR 1: Sustituye "avatar1.jpg" por tu imagen.
-                Cambia style="display:none" a style="display:block" cuando la añadas.
-              -->
-              <img src="avatar1.jpg" alt="Foto de Laura M." style="display:none" />
-              <span class="review-avatar-placeholder">🙋‍♀️</span>
-            </div>
-            <div class="review-author-info">
-              <strong>Laura M.</strong>
-              <span>Madrid</span>
-            </div>
-            <span class="review-dog-tag">🐕 Bruno</span>
-          </div>
-        </div>
-
-        <!-- Review 2 -->
-        <div class="review-card reveal">
-          <div class="review-stars">
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <p class="review-text">
-            "La calidad del acero es brutal. Lleva seis meses mojándose, revolcándose en el barro y todavía como nueva. El QR se lee perfectamente. Muy recomendable."
-          </p>
-          <div class="review-author">
-            <div class="review-avatar">
-              <!--
-                AVATAR 2: Sustituye "avatar2.jpg" por tu imagen.
-                Cambia style="display:none" a style="display:block" cuando la añadas.
-              -->
-              <img src="avatar2.jpg" alt="Foto de Javi R." style="display:none" />
-              <span class="review-avatar-placeholder">🙋‍♂️</span>
-            </div>
-            <div class="review-author-info">
-              <strong>Javi R.</strong>
-              <span>Barcelona</span>
-            </div>
-            <span class="review-dog-tag">🐕 Nala</span>
-          </div>
-        </div>
-
-        <!-- Review 3 -->
-        <div class="review-card reveal">
-          <div class="review-stars">
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <p class="review-text">
-            "Cambié de número y actualicé la ficha en dos minutos desde el móvil. Sin pedir chapa nueva, sin complicaciones. Eso es lo que más me gusta: que no caduca nunca."
-          </p>
-          <div class="review-author">
-            <div class="review-avatar">
-              <!--
-                AVATAR 3: Sustituye "avatar3.jpg" por tu imagen.
-                Cambia style="display:none" a style="display:block" cuando la añadas.
-              -->
-              <img src="avatar3.jpg" alt="Foto de Marta G." style="display:none" />
-              <span class="review-avatar-placeholder">🙋‍♀️</span>
-            </div>
-            <div class="review-author-info">
-              <strong>Marta G.</strong>
-              <span>Valencia</span>
-            </div>
-            <span class="review-dog-tag">🐕 Simba</span>
-          </div>
-        </div>
-
-        <!-- Review 4 -->
-        <div class="review-card reveal">
-          <div class="review-stars">
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <p class="review-text">
-            "El diseño quedó precioso. Pusimos la foto de Kira en la ficha y cuando alguien la escanea, lo primero que ve es su carita. Un detalle que marca la diferencia."
-          </p>
-          <div class="review-author">
-            <div class="review-avatar">
-              <!--
-                AVATAR 4: Sustituye "avatar4.jpg" por tu imagen.
-                Cambia style="display:none" a style="display:block" cuando la añadas.
-              -->
-              <img src="avatar4.jpg" alt="Foto de Carlos P." style="display:none" />
-              <span class="review-avatar-placeholder">🙋‍♂️</span>
-            </div>
-            <div class="review-author-info">
-              <strong>Carlos P.</strong>
-              <span>Sevilla</span>
-            </div>
-            <span class="review-dog-tag">🐕 Kira</span>
-          </div>
-        </div>
-
-        <!-- Review 5 -->
-        <div class="review-card reveal">
-          <div class="review-stars">
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <p class="review-text">
-            "Me llegó en pocos días y perfectamente embalada. La atención por WhatsApp fue rapidísima y me ayudaron a configurar todo. Muy buena experiencia de principio a fin."
-          </p>
-          <div class="review-author">
-            <div class="review-avatar">
-              <!--
-                AVATAR 5: Sustituye "avatar5.jpg" por tu imagen.
-                Cambia style="display:none" a style="display:block" cuando la añadas.
-              -->
-              <img src="avatar5.jpg" alt="Foto de Ana T." style="display:none" />
-              <span class="review-avatar-placeholder">🙋‍♀️</span>
-            </div>
-            <div class="review-author-info">
-              <strong>Ana T.</strong>
-              <span>Bilbao</span>
-            </div>
-            <span class="review-dog-tag">🐕 Thor</span>
-          </div>
-        </div>
-
-        <!-- Review 6 -->
-        <div class="review-card reveal">
-          <div class="review-stars">
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <p class="review-text">
-            "Ya tengo tres chapas, para mis tres perros. Cada una con su ficha propia. El precio es muy justo para lo que ofrece. Repetiré seguro si algún día necesito otra."
-          </p>
-          <div class="review-author">
-            <div class="review-avatar">
-              <!--
-                AVATAR 6: Sustituye "avatar6.jpg" por tu imagen.
-                Cambia style="display:none" a style="display:block" cuando la añadas.
-              -->
-              <img src="avatar6.jpg" alt="Foto de Roberto L." style="display:none" />
-              <span class="review-avatar-placeholder">🙋‍♂️</span>
-            </div>
-            <div class="review-author-info">
-              <strong>Roberto L.</strong>
-              <span>Zaragoza</span>
-            </div>
-            <span class="review-dog-tag">🐕 x3</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ── FAQ ── -->
-  <section id="faq">
-    <div style="max-width:1100px;margin:0 auto">
-      <div class="centered reveal">
-        <span class="section-eyebrow">Preguntas frecuentes</span>
-        <h2 class="section-title">¿Tienes dudas?</h2>
-        <p class="section-sub">Las respuestas a lo que más nos preguntan</p>
-      </div>
-      <div class="faq-list">
-        <div class="faq-item reveal">
-          <button class="faq-question" aria-expanded="false">
-            ¿Qué pasa si cambio de número de teléfono?
-            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <button class="btn-primary" id="btn-nuevo-top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuevo
           </button>
-          <div class="faq-answer">
-            <p>Ningún problema. La ficha de tu perro se actualiza fácilmente y el QR de la chapa siempre apuntará a los datos más recientes. No necesitas pedir una chapa nueva.</p>
-          </div>
         </div>
-        <div class="faq-item reveal">
-          <button class="faq-question" aria-expanded="false">
-            ¿La chapa aguanta el agua y el barro?
-            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </button>
-          <div class="faq-answer">
-            <p>Sí, fabricamos las chapas en acero inoxidable con grabado láser. El QR no se borra con el agua, el barro ni el uso diario. Está diseñada para durar tanto como tu perro la lleva.</p>
-          </div>
+
+        <div id="apartments-grid" class="apartments-grid">
+          <!-- Cards inserted by JS -->
         </div>
-        <div class="faq-item reveal">
-          <button class="faq-question" aria-expanded="false">
-            ¿Necesita internet quien encuentra a mi perro?
-            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </button>
-          <div class="faq-answer">
-            <p>Solo necesita un smartphone con cámara (cualquier iPhone o Android moderno). La cámara reconoce el QR automáticamente y abre la ficha en el navegador. Sin apps, sin registros.</p>
-          </div>
-        </div>
-        <div class="faq-item reveal">
-          <button class="faq-question" aria-expanded="false">
-            ¿Cuánto tarda en llegar el pedido?
-            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </button>
-          <div class="faq-answer">
-            <p>Escríbenos por WhatsApp y te indicamos el plazo exacto según stock y personalización. Habitualmente el proceso es rápido. ¡No dudes en consultarnos!</p>
-          </div>
-        </div>
-        <div class="faq-item reveal">
-          <button class="faq-question" aria-expanded="false">
-            ¿Qué información puedo poner en la ficha?
-            <svg class="faq-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="#5E6074" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </button>
-          <div class="faq-answer">
-            <p>Tú decides qué aparece: nombre del perro, foto, tu número de contacto, información médica relevante, dirección… Tenemos varias plantillas entre las que elegir y lo adaptamos a lo que necesites.</p>
-          </div>
+
+        <div id="empty-state" class="empty-state hidden">
+          <div class="empty-icon">🏠</div>
+          <h3>Aún no tienes apartamentos</h3>
+          <p>Crea tu primer apartamento y genera tu QR en menos de 2 minutos</p>
+          <button class="btn-primary" id="btn-nuevo-empty">Crear apartamento</button>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- ── CONTACTO ── -->
-  <section id="contacto">
-    <div class="contact-inner">
-      <div class="contact-text reveal">
-        <span class="section-eyebrow">Contacto</span>
-        <h2 class="section-title">¿Listo para proteger a tu perro?</h2>
-        <p>Escríbenos por WhatsApp o llámanos directamente. Te contamos todo sin compromiso y preparamos tu PawTag personalizada.</p>
-        <div class="contact-options">
-          <!-- ═══ CAMBIA EL NÚMERO AQUÍ ═══ -->
-          <a href="https://wa.me/34XXXXXXXXX?text=Hola!%20Me%20interesa%20una%20PawTag%20para%20mi%20perro%20%F0%9F%90%BE" class="contact-btn whatsapp" target="_blank" rel="noopener">
-            <span class="contact-btn-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.5 2C6.262 2 2 6.262 2 11.5c0 1.819.497 3.522 1.353 4.994L2 22l5.614-1.338A9.469 9.469 0 0011.5 21C16.738 21 21 16.738 21 11.5S16.738 2 11.5 2z"/></svg>
-            </span>
-            <span class="contact-btn-text">
-              <span>Escríbenos</span>
-              WhatsApp
-            </span>
-          </a>
-          <a href="tel:+34XXXXXXXXX" class="contact-btn phone">
-            <span class="contact-btn-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.02 1.18 2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14v2.92z"/></svg>
-            </span>
-            <span class="contact-btn-text">
-              <span>Llámanos</span>
-              +34 XXX XXX XXX
-            </span>
-          </a>
+      <!-- NUEVO / EDITAR VIEW -->
+      <div id="view-nuevo" class="view">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title" id="form-title">Nuevo apartamento</h1>
+            <p class="page-sub">Rellena la información que verán tus huéspedes</p>
+          </div>
+          <button class="btn-ghost" id="btn-cancelar">Cancelar</button>
         </div>
+
+        <form id="apartment-form" class="apartment-form">
+          <input type="hidden" id="edit-id"/>
+
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-num">1</span>
+              Información básica
+            </h2>
+            <div class="form-grid">
+              <div class="field full">
+                <label>Nombre del apartamento *</label>
+                <input type="text" id="f-nombre" placeholder="Ej: Ático con terraza · Gracia"/>
+              </div>
+              <div class="field full">
+                <label>Dirección</label>
+                <input type="text" id="f-direccion" placeholder="Ej: Calle Mayor 12, 3º 2ª, Barcelona"/>
+              </div>
+              <div class="field">
+                <label>Check-in</label>
+                <input type="text" id="f-checkin" placeholder="Ej: 15:00h"/>
+              </div>
+              <div class="field">
+                <label>Check-out</label>
+                <input type="text" id="f-checkout" placeholder="Ej: 11:00h"/>
+              </div>
+              <div class="field">
+                <label>Nombre red WiFi</label>
+                <input type="text" id="f-wifi-nombre" placeholder="Ej: MiApartamento_5G"/>
+              </div>
+              <div class="field">
+                <label>Contraseña WiFi</label>
+                <input type="text" id="f-wifi-pass" placeholder="Ej: Clave1234"/>
+              </div>
+              <div class="field full">
+                <label>Teléfono de contacto</label>
+                <input type="text" id="f-telefono" placeholder="Ej: +34 600 123 456"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-num">2</span>
+              Normas de la casa
+            </h2>
+            <div id="normas-list" class="normas-list">
+              <!-- normas inserted by JS -->
+            </div>
+            <button type="button" class="btn-add-norma" id="btn-add-norma">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Añadir norma
+            </button>
+          </div>
+
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-num">3</span>
+              Información extra
+            </h2>
+            <div class="form-grid">
+              <div class="field full">
+                <label>Instrucciones de llegada</label>
+                <textarea id="f-llegada" rows="3" placeholder="Ej: Cuando llegues, llama al telefonillo B-3. Te esperamos en la puerta..."></textarea>
+              </div>
+              <div class="field full">
+                <label>Basura y reciclaje</label>
+                <textarea id="f-basura" rows="2" placeholder="Ej: Contenedor azul para papel, amarillo para plásticos..."></textarea>
+              </div>
+              <div class="field full">
+                <label>Aparcamiento</label>
+                <textarea id="f-parking" rows="2" placeholder="Ej: Parking público a 200m en Calle Sol, precio 1.50€/h..."></textarea>
+              </div>
+              <div class="field full">
+                <label>Notas adicionales</label>
+                <textarea id="f-notas" rows="3" placeholder="Cualquier otra información útil para tus huéspedes..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-ghost" id="btn-cancelar2">Cancelar</button>
+            <button type="submit" class="btn-primary large" id="btn-guardar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+              Guardar apartamento
+            </button>
+          </div>
+        </form>
       </div>
-      <div class="contact-visual reveal">
-        <div class="paw-circle">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="60" cy="76" rx="27" ry="24" fill="#2D6A4F" opacity=".25"/>
-            <ellipse cx="30" cy="55" rx="12" ry="14" fill="#2D6A4F" opacity=".25"/>
-            <ellipse cx="90" cy="55" rx="12" ry="14" fill="#2D6A4F" opacity=".25"/>
-            <ellipse cx="42" cy="36" rx="10" ry="13" fill="#2D6A4F" opacity=".25"/>
-            <ellipse cx="78" cy="36" rx="10" ry="13" fill="#2D6A4F" opacity=".25"/>
-          </svg>
-        </div>
-        <p>Respondemos rápido. Cuéntanos cómo se llama tu perro y qué diseño te gusta y te preparamos tu PawTag.</p>
+
+    </main>
+  </div>
+
+  <!-- QR MODAL -->
+  <div id="qr-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <h2 class="modal-title">QR de tu apartamento</h2>
+      <p class="modal-sub" id="modal-apt-name"></p>
+      <div id="qr-container" class="qr-container"></div>
+      <div class="modal-url">
+        <input type="text" id="modal-url-input" readonly/>
+        <button class="btn-copy" id="btn-copy-url" title="Copiar enlace">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary full" id="btn-download-qr">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar QR
+        </button>
+        <a class="btn-ghost full center" id="btn-preview-link" target="_blank">Ver página del huésped →</a>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ── FOOTER ── -->
-  <footer>
-    <div class="footer-inner">
-      <a href="#" class="footer-logo">
-        <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="24" cy="29" rx="10" ry="9" fill="#40916C"/>
-          <ellipse cx="12" cy="22" rx="4.5" ry="5.5" fill="#40916C"/>
-          <ellipse cx="36" cy="22" rx="4.5" ry="5.5" fill="#40916C"/>
-          <ellipse cx="17" cy="16" rx="3.5" ry="4.5" fill="#40916C"/>
-          <ellipse cx="31" cy="16" rx="3.5" ry="4.5" fill="#40916C"/>
-        </svg>
-        <span>PawTag</span>
-      </a>
-      <p class="footer-tagline">La chapa que habla por tu perro 🐾</p>
-      <ul class="footer-links">
-        <li><a href="#como-funciona">Cómo funciona</a></li>
-        <li><a href="#producto">El producto</a></li>
-        <li><a href="#ventajas">Ventajas</a></li>
-        <li><a href="#reviews">Opiniones</a></li>
-        <li><a href="#contacto">Contacto</a></li>
-      </ul>
-      <p class="footer-copy">© 2025 PawTag · Hecho con ❤️ para los que aman a sus perros</p>
+  <!-- CANCEL SUB MODAL -->
+  <div id="cancel-sub-modal" class="modal-overlay hidden">
+    <div class="modal-card small">
+      <h2 class="modal-title">¿Cancelar suscripción?</h2>
+      <p class="modal-sub">Perderás acceso a StayRules Pro al final del periodo actual. Tus apartamentos y QRs seguirán funcionando hasta entonces.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost full" id="btn-keep-sub">Mantener suscripción</button>
+        <button class="btn-danger full" id="btn-confirm-cancel-sub">Sí, cancelar</button>
+      </div>
     </div>
-  </footer>
+  </div>
 
-  <!-- ── JAVASCRIPT ── -->
-  <script>
-    // ── Mobile menu ──
-    const hamburger = document.getElementById('hamburgerBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    hamburger.addEventListener('click', () => {
-      mobileMenu.classList.toggle('open');
-    });
-    function closeMobileMenu() { mobileMenu.classList.remove('open'); }
+  <!-- DELETE CONFIRM MODAL -->
+  <div id="delete-modal" class="modal-overlay hidden">
+    <div class="modal-card small">
+      <h2 class="modal-title">¿Eliminar apartamento?</h2>
+      <p class="modal-sub">Esta acción no se puede deshacer. El QR y la página pública dejarán de funcionar.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost full" id="btn-cancel-delete">Cancelar</button>
+        <button class="btn-danger full" id="btn-confirm-delete">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
 
-    // ── Scroll reveal ──
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
-    reveals.forEach(el => observer.observe(el));
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"></div>
 
-    // ── FAQ accordion ──
-    document.querySelectorAll('.faq-question').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const item = btn.parentElement;
-        const isOpen = item.classList.contains('open');
-        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-        if (!isOpen) item.classList.add('open');
-        btn.setAttribute('aria-expanded', !isOpen);
-      });
-    });
-
-    // ── Smooth active nav highlight ──
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-links a');
-    window.addEventListener('scroll', () => {
-      let current = '';
-      sections.forEach(sec => {
-        if (window.scrollY >= sec.offsetTop - 100) current = sec.id;
-      });
-      navLinks.forEach(a => {
-        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--green)' : '';
-      });
-    }, { passive: true });
-  </script>
+  <!-- Stripe -->
+  <script src="https://js.stripe.com/v3/"></script>
+  <!-- Firebase -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/panel.js"></script>
+  <!-- QRCode library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </body>
 </html>
