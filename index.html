@@ -554,7 +554,7 @@
           <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6 3 3 0 000-6zM3 8a5 5 0 0110 0v1H3V8z"/></svg>
           Seguridad para tu mascota
         </span>
-        <h1 class="hero-title">
+        <h1 class="hero-title" id="hero-titulo">
           La chapa que<br/>
           <em>habla por</em><br/>
           tu perro
@@ -564,7 +564,7 @@
         </p>
         <div class="hero-actions">
           <a href="https://tally.so/r/lb4G26" class="btn-primary" target="_blank" rel="noopener">
-            🐾 Pedir mi chapa
+            🐾 Pedir mi chapa — <span id="precio-hero">12,95€</span>
           </a>
           <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
         </div>
@@ -573,7 +573,7 @@
       <div class="hero-visual">
         <div class="hero-card-wrap">
           <div class="hero-img-box">
-            <img src="hero.jpg" alt="Chapa PawTag en el collar de un perro" style="display:none" />
+            <img src="images/hero.jpg" id="img-hero" alt="Chapa PawTag en el collar de un perro" style="display:none" />
             <div class="hero-img-placeholder-inner">
               <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="8" y="8" width="20" height="20" rx="3" fill="#2D6A4F" opacity=".4"/>
@@ -654,7 +654,7 @@
     <div class="product-inner">
       <div class="product-img-wrap reveal">
         <div class="product-img-frame">
-          <img src="producto.jpg" alt="Chapa de perro con QR de PawTag" style="display:none" />
+          <img id="img-producto" src="images/producto.jpg" alt="Chapa de perro con QR de PawTag" style="display:none" />
           <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
             <rect x="5" y="5" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
             <rect x="47" y="5" width="28" height="28" rx="4" fill="#2D6A4F" opacity=".3"/>
@@ -923,7 +923,7 @@
         <p>Rellena el formulario con los datos de tu perro y paga de forma segura. En pocos días recibirás tu chapa en casa.</p>
         <div class="contact-options">
           <a href="https://tally.so/r/lb4G26" class="btn-primary" target="_blank" rel="noopener" style="justify-content:center;padding:1.1rem 1.4rem;border-radius:var(--radius);font-size:1rem">
-            🐾 Pedir mi chapa ahora
+            🐾 Pedir mi chapa — <span id="precio-contacto">12,95€</span>
           </a>
           <a href="https://wa.me/34XXXXXXXXX?text=Hola!%20Me%20interesa%20una%20PawTag%20para%20mi%20perro%20%F0%9F%90%BE" class="contact-btn whatsapp" target="_blank" rel="noopener">
             <span class="contact-btn-icon">
@@ -1017,6 +1017,61 @@
       sections.forEach(sec => { if (window.scrollY >= sec.offsetTop - 100) current = sec.id; });
       navLinks.forEach(a => { a.style.color = a.getAttribute('href') === '#' + current ? 'var(--green)' : ''; });
     }, { passive: true });
+
+    // ── Cargar config.json ──
+    fetch('config.json')
+      .then(r => r.json())
+      .then(cfg => {
+        const precio = cfg.precio.toFixed(2).replace('.', ',') + cfg.moneda;
+
+        // Precio en botones
+        const ph = document.getElementById('precio-hero');
+        const pc = document.getElementById('precio-contacto');
+        if (ph) ph.textContent = precio;
+        if (pc) pc.textContent = precio;
+
+        // Imagen hero
+        const imgHero = document.getElementById('img-hero');
+        if (imgHero && cfg.imagenes.hero) {
+          imgHero.src = cfg.imagenes.hero;
+          imgHero.style.display = 'block';
+          imgHero.previousElementSibling && (imgHero.nextElementSibling.style.display = 'none');
+          const placeholder = imgHero.nextElementSibling;
+          if (placeholder) placeholder.style.display = 'none';
+        }
+
+        // Imagen producto
+        const imgProd = document.getElementById('img-producto');
+        if (imgProd && cfg.imagenes.producto) {
+          imgProd.src = cfg.imagenes.producto;
+          imgProd.style.display = 'block';
+          const nextSiblings = imgProd.parentElement.querySelectorAll('svg, p.product-img-placeholder-txt');
+          nextSiblings.forEach(el => el.style.display = 'none');
+        }
+
+        // Avatares reviews
+        cfg.imagenes.avatares.forEach((url, i) => {
+          const img = document.querySelector('.review-avatar:nth-of-type(' + (i+1) + ') img');
+          if (img) { img.src = url; img.style.display = 'block'; }
+        });
+
+        // WhatsApp y teléfono
+        if (cfg.contacto.whatsapp) {
+          const waLinks = document.querySelectorAll('a[href*="wa.me"]');
+          waLinks.forEach(a => {
+            a.href = 'https://wa.me/' + cfg.contacto.whatsapp + '?text=Hola!%20Me%20interesa%20una%20PawTag%20para%20mi%20perro%20%F0%9F%90%BE';
+          });
+        }
+        if (cfg.contacto.telefono) {
+          const telLinks = document.querySelectorAll('a[href*="tel:"]');
+          telLinks.forEach(a => {
+            a.href = 'tel:' + cfg.contacto.telefono;
+            const span = a.querySelector('.contact-btn-text span:last-child');
+            if (span) span.textContent = cfg.contacto.telefono;
+          });
+        }
+      })
+      .catch(err => console.warn('config.json no encontrado:', err));
   </script>
 </body>
 </html>
