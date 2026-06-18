@@ -1,0 +1,30 @@
+{
+  "precio": 12.95,
+  "moneda": "€",
+  "hero": {
+    "eyebrow": "Seguridad para tu mascota",
+    "titulo": "La chapa que habla por tu perro",
+    "subtitulo": "Un QR inteligente en su collar. Cualquiera que lo encuentre puede ver sus datos de contacto al instante — sin apps, sin complicaciones.",
+    "badge": "QR VIVO"
+  },
+  "producto": {
+    "titulo": "Una chapa. Un QR. Todo lo que necesitas.",
+    "subtitulo": "Cada PawTag lleva grabado un QR único. Al escanearlo, quien lo encuentre accede a la ficha de tu perro al instante — no necesita descargar ninguna app."
+  },
+  "contacto": {
+    "whatsapp": "34XXXXXXXXX",
+    "telefono": "+34XXXXXXXXX"
+  },
+  "imagenes": {
+    "hero": "images/hero.jpg",
+    "producto": "images/producto.jpg",
+    "avatares": [
+      "images/avatar1.jpg",
+      "images/avatar2.jpg",
+      "images/avatar3.jpg",
+      "images/avatar4.jpg",
+      "images/avatar5.jpg",
+      "images/avatar6.jpg"
+    ]
+  }
+}
