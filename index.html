@@ -462,6 +462,13 @@
     .footer-links { display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; justify-content: center; }
     .footer-links a { text-decoration: none; color: rgba(255,255,255,.5); font-size: .85rem; transition: color .2s; }
     .footer-links a:hover { color: #fff; }
+    .footer-divider {
+      width: 100%; max-width: 280px;
+      height: 1px;
+      background: rgba(255,255,255,.12);
+      margin: .4rem 0;
+    }
+    .footer-links-legal a { font-size: .78rem; }
     .footer-copy { font-size: .8rem; }
 
     /* ── SCROLL ANIMATIONS ── */
@@ -960,7 +967,7 @@
     </div>
   </section>
 
-  <!-- ── FOOTER ── */
+  <!-- ── FOOTER ── -->
   <footer>
     <div class="footer-inner">
       <a href="#" class="footer-logo">
@@ -980,6 +987,13 @@
         <li><a href="#ventajas">Ventajas</a></li>
         <li><a href="#reviews">Opiniones</a></li>
         <li><a href="#contacto">Contacto</a></li>
+      </ul>
+      <div class="footer-divider"></div>
+      <ul class="footer-links footer-links-legal">
+        <li><a href="terminos.html">Términos y condiciones</a></li>
+        <li><a href="privacidad.html">Privacidad</a></li>
+        <li><a href="cookies.html">Cookies</a></li>
+        <li><a href="devoluciones.html">Devoluciones</a></li>
       </ul>
       <p class="footer-copy">© 2026 PawTag · Hecho con ❤️ para los que aman a sus perros</p>
     </div>
